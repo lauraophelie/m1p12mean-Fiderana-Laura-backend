@@ -14,7 +14,6 @@ const ModeleSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 ModeleSchema.pre("save", async function (next) {
-    console.log("vérification marque");
     const marqueExists = await Marque.findById(this.marqueId);
     if (!marqueExists) {
         return next(new Error("La marque indiquée n'existe pas"));
