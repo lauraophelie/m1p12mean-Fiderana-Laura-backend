@@ -5,6 +5,7 @@ const Marque = require('../../models/marque/Marque');
 const Modele = require('../../models/marque/Modele');
 
 const { validateMarque } = require('../../middlewares/validators/marque/validateDataMarque');
+const PrestationMarque = require('../../models/prestation/PrestationMarque');
 
 router.post('/', validateMarque, async (req, res) => {
     try {
@@ -35,6 +36,44 @@ router.get('/modeles/:marqueId', async (req, res) => {
         const modeles = await Modele.find({ marqueId });
 
         res.json({ data: modeles });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+router.get('/:marqueId', async (req, res) => {
+    try {
+        const { marqueId } = req.params;
+        const marque = await Marque.findById(marqueId);
+
+        res.json({ data: marque });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+router.get('/prestations/:marqueId', async (req, res) => {
+    try {
+        const { marqueId } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const prestationsMarque = await PrestationMarque.find({ marqueId })
+            .populate({ path: "prestationId", select: "nomPrestation descriptionPrestation" })
+            .select("prestationId tarif dureeEstimee")
+            .skip(skip).limit(limit);
+
+        const countPrestations = await PrestationMarque.countDocuments({ marqueId: marqueId });
+
+        res.json({
+            data: prestationsMarque,
+            count: countPrestations,
+            currentPage: page,
+            totalPages: Math.ceil(countPrestations / limit),
+            totalItems: countPrestations,
+            itemsPerPage: limit
+        });
     } catch(error) {
         res.status(500).json({ message : error.message });
     }

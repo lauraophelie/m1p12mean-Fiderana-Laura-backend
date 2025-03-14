@@ -32,25 +32,19 @@ router.get('/marques/:prestationId', async (req, res) => {
         const skip = (page - 1) * limit;
 
         const marquesPrestation = await PrestationMarque.find({ prestationId })
-            .populate({
-                path: "marqueId",
-                select: "designationMarque"
-            })
+            .populate({ path: "marqueId", select: "designationMarque" })
             .select("marqueId tarif dureeEstimee")
             .skip(skip).limit(limit);
-        
         const countMarques = await PrestationMarque.countDocuments({ prestationId: prestationId });
 
-        res.json(
-            { 
+        res.json({ 
                 data: marquesPrestation, 
                 count: countMarques,
                 currentPage: page,
                 totalPages: Math.ceil(countMarques / limit),
                 totalItems: countMarques,
                 itemsPerPage: limit
-            }
-        )                                                
+        });                                                
     } catch(error) {
         res.status(500).json({ message : error.message });
     }
