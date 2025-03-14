@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const Service = require('../../models/service/Service');
+const Prestation = require('../../models/prestation/Prestation');
+
 const { validateService } = require('../../middlewares/validators/service/validateDataService');
 
 router.post('/', validateService, async (req, res) => {
@@ -36,7 +38,7 @@ router.get('/paginate', async (req, res) => {
         const [services, total] = await Promise.all([
             Service.find().skip(skip).limit(limit).exec(),
             Service.countDocuments().exec()
-        ])
+        ]);
         const totalPages = Math.ceil(total / limit);
 
         res.json({
@@ -45,7 +47,31 @@ router.get('/paginate', async (req, res) => {
             totalPages,
             totalItems: total,
             itemsPerPage: limit
-        })
+        });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+router.get('/:serviceId', async (req, res) => {
+    try {
+        const { serviceId } = req.params;
+        const service = await Service.findById(serviceId);
+        res.json({ data: service });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+router.get('/prestations/:serviceId', async (req, res) => {
+    try {
+        const { serviceId } = req.params;
+        const prestations = await Prestation.find({ serviceId }).select("_id nomPrestation descriptionPrestation");
+        const countPrestations = await Prestation.countDocuments({ serviceId: serviceId });
+
+        res.json(
+            { data: prestations, count: countPrestations }
+        );
     } catch(error) {
         res.status(500).json({ message : error.message });
     }

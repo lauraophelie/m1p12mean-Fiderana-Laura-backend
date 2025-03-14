@@ -44,4 +44,5 @@ const validatePrestationMarque = [
     }
 ];
 
-exports.validatePrestation = { validatePrestation, validatePrestationMarque };
+exports.validatePrestation = validatePrestation;
+exports.validatePrestationMarque = validatePrestationMarque;
