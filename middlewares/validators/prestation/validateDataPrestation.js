@@ -18,4 +18,30 @@ const validatePrestation = [
     }
 ];
 
-exports.validatePrestation = validatePrestation;
+const validatePrestationMarque = [
+    body('prestationId').notEmpty()
+        .withMessage("La prestation concernée doit être indiquée"),
+    
+    body('marqueId').notEmpty()
+        .withMessage("La prestation concernée doit être indiquée"),
+      
+    body('tarif').notEmpty()
+        .withMessage("Veuillez indiquer le tarif")
+        .isDecimal({ min: 0 })
+        .withMessage("La valeur du tarif ne doit pas être négative"),
+    
+    body('dureeEstimee').notEmpty()
+        .withMessage("Veuillez indiquer la durée estimée")
+        .isInt({ min: 0 })
+        .withMessage("La valeur de la durée estimée ne doit pas être négative"),
+    
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next(); 
+    }
+];
+
+exports.validatePrestation = { validatePrestation, validatePrestationMarque };
