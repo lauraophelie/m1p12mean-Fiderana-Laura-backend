@@ -23,5 +23,6 @@ app.use('/api/marques', require('./routes/marque/marqueRoutes'));
 app.use('/api/modeles', require('./routes/modele/modeleRoutes'));
 app.use('/api/services', require('./routes/service/serviceRoutes'));
 app.use('/api/prestations', require('./routes/prestation/prestationRoutes'));
+app.use('/api/prestationsMarque', require('./routes/prestation/prestationMarqueRoutes'));
 
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));

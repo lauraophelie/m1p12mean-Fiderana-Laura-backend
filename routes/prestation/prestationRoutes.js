@@ -2,6 +2,7 @@ const express = require('express');
 const Prestation = require('../../models/prestation/Prestation');
 const router = express.Router();
 const { validatePrestation } = require('../../middlewares/validators/prestation/validateDataPrestation');
+const PrestationMarque = require('../../models/prestation/PrestationMarque');
 
 router.get('/', async (req, res) => {
     try {
@@ -18,6 +19,38 @@ router.get('/:prestationId', async (req, res) => {
         const prestation = await Prestation.findById(prestationId).populate("serviceId");
 
         res.json({ data : prestation })
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+router.get('/marques/:prestationId', async (req, res) => {
+    try {
+        const { prestationId } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const marquesPrestation = await PrestationMarque.find({ prestationId })
+            .populate({
+                path: "marqueId",
+                select: "designationMarque"
+            })
+            .select("marqueId tarif dureeEstimee")
+            .skip(skip).limit(limit);
+        
+        const countMarques = await PrestationMarque.countDocuments({ prestationId: prestationId });
+
+        res.json(
+            { 
+                data: marquesPrestation, 
+                count: countMarques,
+                currentPage: page,
+                totalPages: Math.ceil(countMarques / limit),
+                totalItems: countMarques,
+                itemsPerPage: limit
+            }
+        )                                                
     } catch(error) {
         res.status(500).json({ message : error.message });
     }
