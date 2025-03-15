@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const validationToken = require('./middleware/AuthentificationMiddleWare');
 
 require('dotenv').config();
 
@@ -21,7 +22,7 @@ mongoose.connect(process.env.MONGO_URI, {
 // routes
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 
-app.use('/employes', require('./routes/employeRoutes')); 
+app.use('/employes',validationToken, require('./routes/employeRoutes')); 
 app.use('/clients', require('./routes/clientRoutes')); 
 app.use('/posteEmployes', require('./routes/posteEmployeRoutes')); 
 app.use('/login', require('./routes/authentificationRoutes')); 
