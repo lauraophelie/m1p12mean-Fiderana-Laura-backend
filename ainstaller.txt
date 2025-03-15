@@ -1,0 +1,3 @@
+npm install validator 
+npm install bcriptjs
+npm install jsonwebtoken
