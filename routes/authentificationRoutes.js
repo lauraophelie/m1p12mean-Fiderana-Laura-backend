@@ -10,15 +10,16 @@ router.post('/', async (req, res) => {
  const {mail,mdp,profil} =req.body;
  let utilisateur={};
  if(profil=="client"){
-    utilisateur= await Client.findOne({mail});
+    utilisateur= await Client.findOne({mail}).populate("poste").populate("profil","nomProfil");
  }else{
-    utilisateur= await Employe.findOne({mail});
+    utilisateur= await Employe.findOne({mail}).populate({path:'poste',populate:{path: 'profil', select: 'nomProfil'} });
  }
  console.log(utilisateur)
  if(utilisateur && await bcrypt.compare(mdp,utilisateur.mdp)){
     const accessToken=jwt.sign({
         utilisateur:{
-            id:utilisateur._id
+            id:utilisateur._id,
+            role:utilisateur.poste.profil.nomProfil
         }
     },process.env.ACCESS_TOKEN_SECRET,
     {expiresIn:"100000m"}
