@@ -13,6 +13,30 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/paginate', async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const prestations = await Prestation.find()
+            .populate({ path: "serviceId", select: "nomService" })
+            .skip(skip).limit(limit);
+        const countPrestations = await Prestation.countDocuments();
+
+        res.json({
+            data: prestations,
+            count: countPrestations,
+            currentPage: page,
+            totalPages: Math.ceil(countPrestations / limit),
+            totalItems: countPrestations,
+            itemsPerPage: limit
+        });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
 router.get('/:prestationId', async (req, res) => {
     try {
         const { prestationId } = req.params;
