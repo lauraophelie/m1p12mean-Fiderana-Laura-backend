@@ -1,4 +1,4 @@
 npm install validator 
-npm install bcriptjs
+npm install bcryptjs
 npm install jsonwebtoken
 npm install express-async-handler
