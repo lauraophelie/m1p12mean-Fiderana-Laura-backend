@@ -2,7 +2,9 @@ const express = require('express');
 const PrestationMarque = require('../../models/prestation/PrestationMarque');
 const router = express.Router();
 const { validatePrestationMarque, validateOnePrestationMarque } = require('../../middlewares/validators/prestation/validateDataPrestation'); 
-const Prestation = require('../../models/prestation/Prestation');
+
+const HistoriquePrestationMarque = require('../../models/prestation/HistoriquePrestationMarque');
+const mongoose = require('mongoose');
 
 router.post('/', validatePrestationMarque, async (req, res) => {
     try {
@@ -19,7 +21,18 @@ router.post('/', validatePrestationMarque, async (req, res) => {
 
 router.put('/:id', validateOnePrestationMarque, async (req, res) => {
     try {
-        const prestationMarque = await PrestationMarque.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const { id } = req.params;
+        const getPrestationMarque = await PrestationMarque.findById(id);
+        if (!getPrestationMarque) {
+            return res.status(404).json({ message: "PrestationMarque non trouvé" });
+        }
+        const setHistorique = HistoriquePrestationMarque({
+            prestationMarqueId: id,
+            ancienTarif: getPrestationMarque.tarif,
+            ancienneDureeEstimee: getPrestationMarque.dureeEstimee
+        });
+        await setHistorique.save();
+        const prestationMarque = await PrestationMarque.findByIdAndUpdate(id, req.body, { new: true });
         res.json(prestationMarque);
     } catch (error) {
         if (error.name === "ValidationError") {
