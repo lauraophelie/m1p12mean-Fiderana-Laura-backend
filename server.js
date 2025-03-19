@@ -19,12 +19,17 @@ mongoose.connect(process.env.MONGO_URI, {
 .catch(err => console.log(err));
 
 // routes
+app.use('/api/marques', require('./routes/marque/marqueRoutes'));
+app.use('/api/modeles', require('./routes/modele/modeleRoutes'));
+app.use('/api/services', require('./routes/service/serviceRoutes'));
+app.use('/api/prestations', require('./routes/prestation/prestationRoutes'));
+app.use('/api/prestationsMarque', require('./routes/prestation/prestationMarqueRoutes'));
+
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 
 app.use('/employes',validationToken, verifierRole ("Client","Admin"),require('./routes/employeRoutes')); 
 app.use('/clients', require('./routes/clientRoutes')); 
 app.use('/posteEmployes', require('./routes/posteEmployeRoutes')); 
 app.use('/login', require('./routes/authentificationRoutes')); 
-
 
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
