@@ -2,6 +2,7 @@ const express = require('express');
 const PrestationMarque = require('../../models/prestation/PrestationMarque');
 const router = express.Router();
 const { validatePrestationMarque } = require('../../middlewares/validators/prestation/validateDataPrestation'); 
+const Prestation = require('../../models/prestation/Prestation');
 
 router.post('/', validatePrestationMarque, async (req, res) => {
     try {
@@ -33,6 +34,18 @@ router.get('/', async (req, res) => {
     try {
         const prestationsMarque = await PrestationMarque.find();
         res.json({ data : prestationsMarque });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+router.get('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const prestationMarque = await PrestationMarque.findById(id)
+                                    .populate({ path: "prestationId", select: "nomPrestation" })
+                                    .populate({ path: "marqueId", select: "designationMarque"});
+        res.json({ data: prestationMarque });
     } catch(error) {
         res.status(500).json({ message : error.message });
     }
