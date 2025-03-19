@@ -16,6 +16,19 @@ router.post('/', validatePrestationMarque, async (req, res) => {
     }
 });
 
+router.put('/:id', validatePrestationMarque, async (req, res) => {
+    try {
+        const prestationMarque = await PrestationMarque.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(prestationMarque);
+    } catch (error) {
+        if (error.name === "ValidationError") {
+            const errors = Object.values(error.errors).map(e => e.message);
+            res.status(400).json({ errors });
+        }
+        res.status(400).json({ message: error.message });
+    }
+});
+
 router.get('/', async (req, res) => {
     try {
         const prestationsMarque = await PrestationMarque.find();

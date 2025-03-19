@@ -112,4 +112,17 @@ router.post('/', validatePrestation, async (req, res) => {
     }
 });
 
+router.put('/:prestationId', validatePrestation, async (req, res) => {
+    try {
+        const prestation = await Prestation.findByIdAndUpdate(req.params.prestationId, req.body, { new: true });
+        res.json(prestation);
+    } catch(error) {
+        if (error.name === "ValidationError") {
+            const errors = Object.values(error.errors).map(e => e.message);
+            res.status(400).json({ errors });
+        }
+        res.status(400).json({ message: error.message });
+    }
+});
+
 module.exports = router;
