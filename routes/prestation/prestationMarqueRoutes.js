@@ -1,7 +1,7 @@
 const express = require('express');
 const PrestationMarque = require('../../models/prestation/PrestationMarque');
 const router = express.Router();
-const { validatePrestationMarque } = require('../../middlewares/validators/prestation/validateDataPrestation'); 
+const { validatePrestationMarque, validateOnePrestationMarque } = require('../../middlewares/validators/prestation/validateDataPrestation'); 
 const Prestation = require('../../models/prestation/Prestation');
 
 router.post('/', validatePrestationMarque, async (req, res) => {
@@ -17,7 +17,7 @@ router.post('/', validatePrestationMarque, async (req, res) => {
     }
 });
 
-router.put('/:id', validatePrestationMarque, async (req, res) => {
+router.put('/:id', validateOnePrestationMarque, async (req, res) => {
     try {
         const prestationMarque = await PrestationMarque.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(prestationMarque);
