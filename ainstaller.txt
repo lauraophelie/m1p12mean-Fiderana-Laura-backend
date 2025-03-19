@@ -1,0 +1,4 @@
+npm install validator 
+npm install bcriptjs
+npm install jsonwebtoken
+npm install express-async-handler

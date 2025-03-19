@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
+const { validationToken, verifierRole } = require('./middleware/AuthentificationMiddleWare');
 require('dotenv').config();
 
 const app = express();
@@ -24,5 +24,12 @@ app.use('/api/modeles', require('./routes/modele/modeleRoutes'));
 app.use('/api/services', require('./routes/service/serviceRoutes'));
 app.use('/api/prestations', require('./routes/prestation/prestationRoutes'));
 app.use('/api/prestationsMarque', require('./routes/prestation/prestationMarqueRoutes'));
+
+app.use('/profils', require('./routes/profilRoutes')); 
+app.use('/postes', require('./routes/posteRoutes')); 
+app.use('/employes',validationToken, verifierRole ("Client","Admin"),require('./routes/employeRoutes')); 
+app.use('/clients', require('./routes/clientRoutes')); 
+app.use('/posteEmployes', require('./routes/posteEmployeRoutes')); 
+app.use('/login', require('./routes/authentificationRoutes')); 
 
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
