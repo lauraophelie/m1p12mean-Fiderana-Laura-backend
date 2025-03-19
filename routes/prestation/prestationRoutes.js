@@ -40,7 +40,7 @@ router.get('/paginate', async (req, res) => {
 router.get('/:prestationId', async (req, res) => {
     try {
         const { prestationId } = req.params;
-        const prestation = await Prestation.findById(prestationId).populate("serviceId");
+        const prestation = await Prestation.findById(prestationId).populate({ path: "serviceId", select: "nomService" });
 
         res.json({ data : prestation })
     } catch(error) {
@@ -52,7 +52,7 @@ router.get('/marques/:prestationId', async (req, res) => {
     try {
         const { prestationId } = req.params;
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
+        const limit = parseInt(req.query.limit) || 5;
         const skip = (page - 1) * limit;
 
         const marquesPrestation = await PrestationMarque.find({ prestationId })
@@ -62,12 +62,12 @@ router.get('/marques/:prestationId', async (req, res) => {
         const countMarques = await PrestationMarque.countDocuments({ prestationId: prestationId });
 
         res.json({ 
-                data: marquesPrestation, 
-                count: countMarques,
-                currentPage: page,
-                totalPages: Math.ceil(countMarques / limit),
-                totalItems: countMarques,
-                itemsPerPage: limit
+            data: marquesPrestation, 
+            count: countMarques,
+            currentPage: page,
+            totalPages: Math.ceil(countMarques / limit),
+            totalItems: countMarques,
+            itemsPerPage: limit
         });                                                
     } catch(error) {
         res.status(500).json({ message : error.message });
