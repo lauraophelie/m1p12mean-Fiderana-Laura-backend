@@ -20,6 +20,19 @@ router.post('/', validateService, async (req, res) => {
     }
 });
 
+router.put('/:serviceId', validateService, async (req, res) => {
+    try {
+        const service = await Service.findByIdAndUpdate(req.params.serviceId, req.body, { new: true });
+        res.json(service);
+    } catch(error) {
+        if (error.name === "ValidationError") {
+            const errors = Object.values(error.errors).map(e => e.message);
+            res.status(400).json({ errors });
+        }
+        res.status(400).json({ message: error.message });
+    }
+});
+
 router.get('/', async (req, res) => {
     try {
         const services = await Service.find();
