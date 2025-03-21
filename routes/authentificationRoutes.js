@@ -10,7 +10,7 @@ router.post('/', async (req, res) => {
  const {mail,mdp,profil} =req.body;
  let utilisateur={};
  if(profil=="client"){
-    utilisateur= await Client.findOne({mail}).populate("poste").populate("profil","nomProfil");
+    utilisateur= await Client.findOne({mail});
  }else{
     utilisateur= await Employe.findOne({mail}).populate({path:'poste',populate:{path: 'profil', select: 'nomProfil'} });
  }
