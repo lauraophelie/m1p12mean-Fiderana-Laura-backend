@@ -25,6 +25,7 @@ app.use('/api/services', require('./routes/service/serviceRoutes'));
 app.use('/api/prestations', require('./routes/prestation/prestationRoutes'));
 app.use('/api/prestationsMarque', require('./routes/prestation/prestationMarqueRoutes'));
 app.use('/api/pieces', require('./routes/pieces/pieceRoutes'));
+app.use('/api/categoriePiece', require('./routes/pieces/categoriePieceRoutes'));
 
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 
