@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const CategoriePiece = require('../../models/pieces/CategoriePiece');
+const { validateCategoriePiece } = require('../../middlewares/validators/pieces/validatePieceData');
 
-router.post('/', async (req, res) => {
+router.post('/', validateCategoriePiece, async (req, res) => {
     try {
         const categoriePiece = new CategoriePiece(req.body);
         await categoriePiece.save();
