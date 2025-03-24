@@ -66,6 +66,17 @@ router.get('/paginate', async (req, res) => {
     }
 });
 
+router.get('/random', async (req, res) => {
+    try {
+        const randomServices = await Service.aggregate([
+            { $sample: { size: 3 }}
+        ]);
+        res.json({ data : randomServices });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
 router.get('/:serviceId', async (req, res) => {
     try {
         const { serviceId } = req.params;
