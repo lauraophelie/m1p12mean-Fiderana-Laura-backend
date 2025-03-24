@@ -2,17 +2,32 @@ const express = require('express');
 const Voiture = require('../../models/voiture/Voiture');
 const router = express.Router();
 const { validateVoiture } = require('../../middlewares/validators/voitures/validateVoiture');
+const DetailsVoiture = require('../../models/voiture/DetailsVoiture');
+const upload = require('../../config/storage');
 
-router.post('/', validateVoiture, async (req, res) => {
+router.post('/', upload.array('images', 5), validateVoiture, async (req, res) => {
     try {
         const voiture = new Voiture(req.body);
         await voiture.save();
+
+        if (req.files || req.files.length > 0) {
+            const imagePaths = req.files.map(file => file.path);
+            const detailsVoiture = new DetailsVoiture({
+                voitureId: voiture._id,
+                remarques: req.body.remarques,
+                images: imagePaths
+            });
+            await detailsVoiture.save();
+        }
 
         res.status(201).json(voiture);
     } catch(error) {
         if (error.name === "ValidationError") {
             const errors = Object.values(error.errors).map(e => e.message);
             res.status(400).json({ errors });
+        }
+        if (error.code === 'LIMIT_FILE_SIZE') {
+            res.status(400).json({ message: 'Le fichier est trop volumineux. Taille maximale autorisée : 3 Mo.' });
         }
         res.status(400).json({ message: error.message });
     }

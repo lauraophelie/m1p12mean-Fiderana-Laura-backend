@@ -15,6 +15,9 @@ router.post('/:voitureId', upload.array('images', 5), async (req, res) => {
         await detailsVoiture.save();
         res.status(201).json(detailsVoiture);
     } catch(error) {
+        if (error.code === 'LIMIT_FILE_SIZE') {
+            res.status(400).json({ message: 'Le fichier est trop volumineux. Taille maximale autorisée : 3 Mo.' });
+        }
         res.status(400).json({ message: error.message });
     }
 });
