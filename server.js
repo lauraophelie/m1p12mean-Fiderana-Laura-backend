@@ -18,6 +18,9 @@ mongoose.connect(process.env.MONGO_URI, {
 }).then(() => console.log("MongoDB connecté"))
 .catch(err => console.log(err));
 
+// upload images
+app.use('/uploads', express.static('uploads'));
+
 // routes
 app.use('/api/marques', require('./routes/marque/marqueRoutes'));
 app.use('/api/modeles', require('./routes/modele/modeleRoutes'));
@@ -28,6 +31,7 @@ app.use('/api/pieces', require('./routes/pieces/pieceRoutes'));
 app.use('/api/categoriePiece', require('./routes/pieces/categoriePieceRoutes'));
 app.use('/api/voiture', require('./routes/voiture/voitureRoutes'));
 app.use('/api/elementsVoiture', require('./routes/voiture/elementsVoiture'));
+app.use('/api/detailsVoiture', require('./routes/voiture/detailsVoitureRoutes'));
 
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 
