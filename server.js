@@ -27,6 +27,7 @@ app.use('/api/prestationsMarque', require('./routes/prestation/prestationMarqueR
 app.use('/api/pieces', require('./routes/pieces/pieceRoutes'));
 app.use('/api/categoriePiece', require('./routes/pieces/categoriePieceRoutes'));
 app.use('/api/voiture', require('./routes/voiture/voitureRoutes'));
+app.use('/api/elementsVoiture', require('./routes/voiture/elementsVoiture'));
 
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 

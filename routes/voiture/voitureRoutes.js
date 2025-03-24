@@ -31,10 +31,10 @@ router.put('/:voitureId', validateVoiture, async (req, res) => {
     }
 });
 
-router.get('/:clientId', async (req, res) => {
+router.get('/:voitureId', async (req, res) => {
     try {
-        const { clientId } = req.params;
-        const voiture = await Voiture.findById(clientId)
+        const { voitureId } = req.params;
+        const voiture = await Voiture.findById(voitureId)
             .populate({ path: "marqueId", select: "designationMarque"})
             .populate({ path: "modeleId", select: "designationModele"})
             .populate({ path: "categorieVoitureId", select: "designationCategorie"})
