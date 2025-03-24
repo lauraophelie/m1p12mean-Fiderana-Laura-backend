@@ -5,6 +5,7 @@ const Modele = require('../marque/Modele');
 const CategorieVoiture = require('./CategorieVoiture');
 const TypeEnergie = require('./TypeEnergie');
 const BoiteVitesse = require('./BoiteVitesse');
+const Client = require('../Client');
 
 const VoitureSchema = new mongoose.Schema({
     immatriculation: {
@@ -40,10 +41,19 @@ const VoitureSchema = new mongoose.Schema({
     anneeFabrication: {
         type: Number,
         required: false
+    },
+    clientId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Client",
+        required: true
     }
 }, { timestamps: true });
 
 VoitureSchema.pre("save", async function (next) {
+    const clientExists = await Client.findById(this.clientId);
+    if(!clientExists) {
+        return next(new Error("Le client n'existe pas"));
+    }
     const marqueExists = await Marque.findById(this.marqueId);
     if (!marqueExists) {
         return next(new Error("La marque indiquée n'existe pas"));
