@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const CategoriePiece = require('./CategoriePiece');
 
 const PieceSchema = new mongoose.Schema({
     nomPiece: {
@@ -25,5 +26,13 @@ const PieceSchema = new mongoose.Schema({
         min: [0, "Le prix unitaire ne doit pas être négatif"]
     }
 }, { timestamps: true });
+
+PieceSchema.pre("save", async function (next) {
+    const categorieExists = await CategoriePiece.findById(this.categoriePieceId);
+    if(!categorieExists) {
+        return next(new Error("La catégorie indiquée n'existe pas"));
+    }
+    next();
+});
 
 module.exports = mongoose.model('Piece', PieceSchema);
