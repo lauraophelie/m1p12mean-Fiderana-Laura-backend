@@ -8,7 +8,7 @@ router.post('/', validateCategoriePiece, async (req, res) => {
     try {
         const categoriePiece = new CategoriePiece(req.body);
         await categoriePiece.save();
-        res.status(201).json(marque);
+        res.status(201).json(categoriePiece);
     } catch(error) {
         if (error.name === "ValidationError") {
             const errors = Object.values(error.errors).map(e => e.message);

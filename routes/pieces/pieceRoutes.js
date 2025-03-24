@@ -15,7 +15,7 @@ router.post('/', validatePiece, async (req, res) => {
 
         for(let i = 0; i < modelesListes.length; i++) {
             const modeleVoiturePiece = new ModeleVoiturePiece({
-                piedeId: piece._id,
+                pieceId: piece._id,
                 modeleVoitureId: modelesListes[i]
             });
             modelesPieces.push(modeleVoiturePiece);
