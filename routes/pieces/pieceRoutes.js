@@ -2,10 +2,14 @@ const express = require('express');
 const router = express.Router();
 
 const Piece = require('../../models/pieces/Piece');
+const { validatePiece } = require('../../middlewares/validators/pieces/validatePieceData');
 
-router.post('/', async (req, res) => {
+router.post('/', validatePiece, async (req, res) => {
     try {
+        const piece = new Piece(req.body);
+        await piece.save();
 
+        res.status(201).json(marque);
     } catch(error) {
         if (error.name === "ValidationError") {
             const errors = Object.values(error.errors).map(e => e.message);

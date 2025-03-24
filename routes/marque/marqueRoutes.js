@@ -11,7 +11,7 @@ router.post('/', validateMarque, async (req, res) => {
     try {
         const marque = new Marque(req.body);
         await marque.save();
-        res.status(201).json(marque)
+        res.status(201).json(marque);
     } catch(error) {
         if (error.name === "ValidationError") {
             const errors = Object.values(error.errors).map(e => e.message);
