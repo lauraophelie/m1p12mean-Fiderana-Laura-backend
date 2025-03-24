@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Piece = require('../../models/pieces/Piece');
+const ModeleVoiturePiece = require('../../models/pieces/ModeleVoiturePiece');
 const { validatePiece } = require('../../middlewares/validators/pieces/validatePieceData');
 
 router.post('/', validatePiece, async (req, res) => {
@@ -9,7 +10,19 @@ router.post('/', validatePiece, async (req, res) => {
         const piece = new Piece(req.body);
         await piece.save();
 
-        res.status(201).json(marque);
+        const modelesListes = req.body.modelesCompatibles;
+        const modelesPieces = [];
+
+        for(let i = 0; i < modelesListes.length; i++) {
+            const modeleVoiturePiece = new ModeleVoiturePiece({
+                piedeId: piece._id,
+                modeleVoitureId: modelesListes[i]
+            });
+            modelesPieces.push(modeleVoiturePiece);
+        }
+        await ModeleVoiturePiece.insertMany(modelesPieces); 
+
+        res.status(201).json(piece);
     } catch(error) {
         if (error.name === "ValidationError") {
             const errors = Object.values(error.errors).map(e => e.message);
