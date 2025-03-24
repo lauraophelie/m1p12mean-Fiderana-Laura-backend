@@ -23,6 +23,8 @@ const validatePiece = [
         .withMessage('Veuillez indiquer le seuil d\'alerte pour le stock'),
     body('prixUnitaire').trim().notEmpty()
         .withMessage('Veuillez indiquer le prix unitaire de la pièce'),
+    body('modelesCompatibles').notEmpty()
+        .withMessage('Veuillez indiquez les modèles de voiture compatibles à la pièce'),
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
