@@ -9,7 +9,7 @@ router.post('/:voitureId', upload.array('images', 5), async (req, res) => {
         const imagePaths = req.files.map(file => file.path);
         const detailsVoiture = new DetailsVoiture({
             voitureId: voitureId,
-            remarques: body.remarques,
+            remarques: req.body.remarques,
             images: imagePaths
         });
         await detailsVoiture.save();
