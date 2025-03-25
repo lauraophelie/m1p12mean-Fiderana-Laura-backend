@@ -9,7 +9,7 @@ const RendezVousSchema = new mongoose.Schema({
         required: [true, "La date de rendez-vous est obligatoire"]
     },
     heureRdv: {
-        type: TimeRanges,
+        type: String,
         required: [true, "L'heure de rendez-vous est obligatoire"]
     },
     clientId: {
@@ -25,6 +25,11 @@ const RendezVousSchema = new mongoose.Schema({
     commentaire: {
         type: String,
         required: false
+    },
+    status: {
+        type: Number,
+        required: false,
+        default: 0
     }
 }, { timestamps: true });
 
