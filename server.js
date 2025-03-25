@@ -32,6 +32,8 @@ app.use('/api/categoriePiece', require('./routes/pieces/categoriePieceRoutes'));
 app.use('/api/voiture', require('./routes/voiture/voitureRoutes'));
 app.use('/api/elementsVoiture', require('./routes/voiture/elementsVoiture'));
 app.use('/api/detailsVoiture', require('./routes/voiture/detailsVoitureRoutes'));
+app.use('/rendezVous', require('./routes/rdv/rendezVousRoutes'));
+
 
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 
