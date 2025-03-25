@@ -30,6 +30,56 @@ router.post('/', validateDataRdv, async (req, res) => {
     }
 });
 
+router.put('/:rdvId', validateDataRdv, async (req, res) => {
+    try {
+        const { rdvId } = req.params;
+        const rdv = await RendezVous.findByIdAndUpdate(rdvId, req.body, { new: true });
+        res.json(rdv);
+    } catch(error) {
+        if (error.name === "ValidationError") {
+            const errors = Object.values(error.errors).map(e => e.message);
+            res.status(400).json({ errors });
+        }
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/annulation/:rdvId', async (req, res) => {
+    try {
+        const { rdvId } = req.params;
+        const annulation = await RendezVous.updateOne(
+            { _id: rdvId }, { $set: { status: -10 } }
+        );
+        res.json(annulation);
+    } catch(error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.get('/:rdvId', async (req, res) => {
+    try {
+        const { rdvId } = req.params;
+        const rdv = await RendezVous.findById(rdvId)
+            populate({ 
+                path: "voitureId", 
+                select: "_id immatriculation marqueId modeleId categorieVoitureId",
+                populate: [
+                    { path: "marqueId", select: "designationMarque" },
+                    { path: "modeleId", select: "designationModele" },
+                    { path: "categorieVoitureId", select: "designationCategorie" }
+                ]
+            })
+            .populate({ path: "clientId", select: "_id nomClient prenom phone mail"});
+        res.json({ data: rdv });
+    } catch(error) {
+        if (error.name === "ValidationError") {
+            const errors = Object.values(error.errors).map(e => e.message);
+            res.status(400).json({ errors });
+        }
+        res.status(400).json({ message: error.message });
+    }
+});
+
 router.get('/paginate', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;

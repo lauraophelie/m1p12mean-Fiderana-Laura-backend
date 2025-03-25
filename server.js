@@ -33,7 +33,7 @@ app.use('/api/voiture', require('./routes/voiture/voitureRoutes'));
 app.use('/api/elementsVoiture', require('./routes/voiture/elementsVoiture'));
 app.use('/api/detailsVoiture', require('./routes/voiture/detailsVoitureRoutes'));
 app.use('/rendezVous', require('./routes/rdv/rendezVousRoutes'));
-
+app.use('/rendezVousServices', require('./routes/rdv/rendezVousServicesRoutes'));
 
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 
