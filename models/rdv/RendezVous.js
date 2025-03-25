@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+const Client = require('../Client');
+const Voiture = require('../voiture/Voiture');
+
 const RendezVousSchema = new mongoose.Schema({
     dateRdv: {
         type: Date,
@@ -24,5 +27,17 @@ const RendezVousSchema = new mongoose.Schema({
         required: false
     }
 }, { timestamps: true });
+
+RendezVousSchema.pre("save", async function (next) {
+    const clientExists = await Client.findById(this.clientId);
+    if(!clientExists) {
+        return next(new Error("Le client n'existe pas"));
+    }
+    const voitureExists = await Voiture.findById(this.voitureId);
+    if(!voitureExists) {
+        return next(new Error("La voiture indiquée n'existe pas"));
+    }
+    next();
+});
 
 module.exports = mongoose.model('RendezVous', RendezVousSchema);
