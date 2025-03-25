@@ -14,6 +14,15 @@ router.get('/:rdvId', async (req, res) => {
     }
 });
 
+router.get('/', async (req, res) => {
+    try {
+        const services = await ServicesRendezVous.find();
+        res.json({ data: services });
+    } catch (error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
 router.delete('/:id', async (req, res) => {
     try {
         await ServicesRendezVous.findByIdAndDelete(req.params.id);

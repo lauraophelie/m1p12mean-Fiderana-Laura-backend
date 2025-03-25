@@ -19,7 +19,7 @@ router.post('/', validateDataRdv, async (req, res) => {
             });
             services.push(serviceRdv);
         }
-        await ServicesRendezVous.insertMany(servicesRdv);
+        await ServicesRendezVous.insertMany(services);
         res.status(201).json(rdv);
     } catch (error) {
         if (error.name === "ValidationError") {
@@ -56,6 +56,15 @@ router.put('/annulation/:rdvId', async (req, res) => {
     }
 });
 
+router.get('/', async (req, res) => {
+    try {
+        const rdv = await RendezVous.find();
+        res.json({ data: rdv });
+    } catch (error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
 router.get('/:rdvId', async (req, res) => {
     try {
         const { rdvId } = req.params;
@@ -72,11 +81,7 @@ router.get('/:rdvId', async (req, res) => {
             .populate({ path: "clientId", select: "_id nomClient prenom phone mail"});
         res.json({ data: rdv });
     } catch(error) {
-        if (error.name === "ValidationError") {
-            const errors = Object.values(error.errors).map(e => e.message);
-            res.status(400).json({ errors });
-        }
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message : error.message });
     }
 });
 
