@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const DemandePieceSchema = new mongoose.Schema({
     dateDemande: {
         type: Date,
-        required: true,
+        required: false,
         default: Date.now()
     },
     motifDemande: {
