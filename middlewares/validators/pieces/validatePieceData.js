@@ -1,6 +1,12 @@
 const { body, validationResult } = require('express-validator');
 
 const validateCategoriePiece = [
+    (req, res, next) => {
+        if(!req.body) {
+            return res.status(400).json({ message: 'Veuillez remplir les informations requises'})
+        }
+        next();
+    },
     body('designationCategoriePiece').trim().notEmpty()
         .withMessage("Veuillez indiquer le nom de la catégorie de pièce"),
     (req, res, next) => {
@@ -13,6 +19,12 @@ const validateCategoriePiece = [
 ];
 
 const validatePiece = [
+    (req, res, next) => {
+        if(!req.body) {
+            return res.status(400).json({ message: 'Veuillez remplir les informations requises'})
+        }
+        next();
+    },
     body('nomPiece').trim().notEmpty()
         .withMessage('Veuillez indiquer le nom de la pièce'),
     body('categoriePieceId').trim().notEmpty()

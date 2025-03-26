@@ -1,6 +1,12 @@
 const { body, validationResult } = require('express-validator');
 
 const validatePrestation = [
+    (req, res, next) => {
+        if(!req.body) {
+            return res.status(400).json({ message: 'Veuillez remplir les informations requises'})
+        }
+        next();
+    },
     body('nomPrestation').trim().notEmpty()
         .withMessage("Veuillez indiquer le nom de la prestation")
         .isLength({ min: 3 })

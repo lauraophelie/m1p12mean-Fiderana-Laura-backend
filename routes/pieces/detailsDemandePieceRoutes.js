@@ -2,6 +2,7 @@ const express = require('express');
 const DetailsDemandePiece = require('../../models/pieces/demande/DetailsDemandePiece');
 const DemandePiece = require('../../models/pieces/demande/DemandePiece');
 const router = express.Router();
+const { validateDeleteDemande } = require('../../middlewares/validators/pieces/validateDemandePiece');
 
 router.get('/:demandeId', async (req, res) => {
     try {
@@ -23,7 +24,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.delete('/:demandeId', async (req, res) => {
+router.delete('/:demandeId', validateDeleteDemande, async (req, res) => {
     try {
         const { demandeId } = req.params;
         await DetailsDemandePiece.deleteMany({ demandeId: demandeId });
