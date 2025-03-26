@@ -23,4 +23,14 @@ const DetailsDemandePieceSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+DetailsDemandePieceSchema.methods.validateDetails = async function(status = 10) {
+    try {
+        return await this.updateOne(
+            { demandeId: this.demandeId }, { $set: { status: status }}
+        );
+    } catch(error) {
+        throw new Error(error);
+    }
+}
+
 module.exports = mongoose.model('DetailsDemandePiece', DetailsDemandePieceSchema);

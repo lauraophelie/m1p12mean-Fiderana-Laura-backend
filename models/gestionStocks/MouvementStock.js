@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Piece = require('../pieces/Piece');
 
 const MouvementStockSchema = new mongoose.Schema({
     dateStock: {
@@ -29,5 +30,20 @@ const MouvementStockSchema = new mongoose.Schema({
         min: [0, "La quantité ne doit pas être négative"]
     }
 }, { timestamps: true });
+
+MouvementStockSchema.methods.sortieStock = async function(data) {
+    try {
+        const pieceFind = await Piece.findById(data.pieceId);
+
+        this.dateStock = data.dateStock ? new Date(data.dateStock) : Date.now();
+        this.pieceId = data.pieceId;
+        this.prixUnitaire = pieceFind.prixUnitaire;
+        this.quantiteSortie = data.quantiteSortie;
+
+        return await this.save();
+    } catch (error) {
+        throw new Error(error);
+    }
+}
 
 module.exports = mongoose.model('MouvementStock', MouvementStockSchema);

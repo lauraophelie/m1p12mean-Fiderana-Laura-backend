@@ -22,4 +22,14 @@ const DemandePieceSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+DemandePieceSchema.methods.validateDemande = async function(status = 10) {
+    try {
+        return await this.updateOne(
+            { _id: this._id }, { $set: { status: status }}
+        );
+    } catch (error) {
+        throw new Error(error);
+    }
+}
+
 module.exports = mongoose.model('DemandePiece', DemandePieceSchema);

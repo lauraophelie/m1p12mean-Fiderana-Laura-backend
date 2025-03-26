@@ -27,6 +27,13 @@ router.post('/', validateDataDemande, validateDataDetailsDemande, async (req, re
 router.post('/validation/:demandeId', async (req, res) => {
     try {
         const { demandeId } = req.params;
+        const demande = await DemandePiece.findById(demandeId);
+
+        if(!demande) {
+            res.status(400).json({ message: "La demande n'existe pas"});
+        }
+        await demande.validateDemande();
+        const detailsDemande = await DetailsDemandePiece.find({ demandeId });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
