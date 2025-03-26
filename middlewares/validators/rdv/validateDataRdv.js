@@ -1,6 +1,12 @@
 const { body, validationResult } = require('express-validator');
 
 const validateDataRdv = [
+    (req, res, next) => {
+        if(!req.body) {
+            return res.status(400).json({ message: 'Veuillez remplir les informations requises'})
+        }
+        next();
+    },
     body('dateRdv').trim().notEmpty()
         .withMessage("Veuillez indiquer la date du rendez-vous"),
     body('heureRdv').trim().notEmpty()

@@ -1,6 +1,12 @@
 const { body, validationResult } = require('express-validator');
 
 const validateVoiture = [
+    (req, res, next) => {
+        if(!req.body) {
+            return res.status(400).json({ message: 'Veuillez remplir les informations requises'})
+        }
+        next();
+    },
     body('immatriculation').trim().notEmpty()
         .withMessage("Veuillez indiquer le numéro d'immatriculation"),
     body('marqueId').trim().notEmpty()
