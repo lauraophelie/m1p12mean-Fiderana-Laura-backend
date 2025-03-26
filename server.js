@@ -36,6 +36,7 @@ app.use('/api/rendezVous', require('./routes/rdv/rendezVousRoutes'));
 app.use('/api/rendezVousServices', require('./routes/rdv/rendezVousServicesRoutes'));
 app.use('/api/demandePiece', require('./routes/pieces/demandePieceRoutes'));
 app.use('/api/demandePieceDetails', require('./routes/pieces/detailsDemandePieceRoutes'));
+app.use('/api/stocks', require('./routes/gestionStocks/stocksRoutes'));
 
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 

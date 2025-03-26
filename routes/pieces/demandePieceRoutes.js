@@ -24,6 +24,14 @@ router.post('/', validateDataDemande, validateDataDetailsDemande, async (req, re
     }
 });
 
+router.post('/validation/:demandeId', async (req, res) => {
+    try {
+        const { demandeId } = req.params;
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
 router.put('/:demandeId', validateDataDemande, async (req, res) => {
     try {
         const { demandeId } = req.params;

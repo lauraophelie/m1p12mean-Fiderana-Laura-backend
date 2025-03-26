@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const MouvementStockSchema = new mongoose.Schema({
+const StockVirtuelMecanicienSchema = new mongoose.Schema({
     dateStock: {
         type: Date, 
         required: true,
@@ -10,11 +10,6 @@ const MouvementStockSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Piece",
         required: true
-    },
-    prixUnitaire: {
-        type: Number,
-        required: true,
-        min: [0, "Le prix unitaire ne doit pas être négatif"]
     },
     quantiteEntree: {
         type: Number,
@@ -27,7 +22,12 @@ const MouvementStockSchema = new mongoose.Schema({
         required: false,
         default: 0,
         min: [0, "La quantité ne doit pas être négative"]
+    },
+    mecanicienId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Employe",
+        required: true
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('MouvementStock', MouvementStockSchema);
+module.exports = mongoose.model('StockVirtuelMecanicien', StockVirtuelMecanicienSchema);
