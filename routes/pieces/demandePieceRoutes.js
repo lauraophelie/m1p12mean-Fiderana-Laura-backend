@@ -3,6 +3,7 @@ const DemandePiece = require('../../models/pieces/demande/DemandePiece');
 const DetailsDemandePiece = require('../../models/pieces/demande/DetailsDemandePiece');
 const router = express.Router();
 const { validateDataDemande, validateDataDetailsDemande, validateDeleteDemande } = require('../../middlewares/validators/pieces/validateDemandePiece');
+const { validationDemandePiece } = require('../../models/gestionStocks/EtatStocks');
 
 router.post('/', validateDataDemande, validateDataDetailsDemande, async (req, res) => {
     try {
@@ -32,7 +33,15 @@ router.post('/validation/:demandeId', async (req, res) => {
         if(!demande) {
             res.status(400).json({ message: "La demande n'existe pas"});
         }
-        // const detailsDemande = await DetailsDemandePiece.find({ demandeId });
+        const detailsDemande = await DetailsDemandePiece.find({ demandeId });
+        await Promise.all(detailsDemande.map(async (details) => {
+            const data = {
+                pieceId: details.pieceId,
+                quantiteSortie: details.quantite,
+                quantiteEntree: details.quantite,
+            };
+            await validationDemandePiece(data, demande.mecanicienId);
+        }));
 
         await DetailsDemandePiece.updateMany(
             { demandeId: demandeId }, { $set: { status: 10 }}

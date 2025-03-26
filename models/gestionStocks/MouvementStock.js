@@ -31,19 +31,19 @@ const MouvementStockSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-MouvementStockSchema.methods.sortieStock = async function(data) {
-    try {
-        const pieceFind = await Piece.findById(data.pieceId);
+// MouvementStockSchema.methods.sortieStock = async function(data) {
+//     try {
+//         const pieceFind = await Piece.findById(data.pieceId);
 
-        this.dateStock = data.dateStock ? new Date(data.dateStock) : Date.now();
-        this.pieceId = data.pieceId;
-        this.prixUnitaire = pieceFind.prixUnitaire;
-        this.quantiteSortie = data.quantiteSortie;
+//         this.dateStock = data.dateStock ? new Date(data.dateStock) : Date.now();
+//         this.pieceId = data.pieceId;
+//         this.prixUnitaire = pieceFind.prixUnitaire;
+//         this.quantiteSortie = data.quantiteSortie;
 
-        return await this.save();
-    } catch (error) {
-        throw new Error(error);
-    }
-}
+//         return await this.save();
+//     } catch (error) {
+//         throw new Error(error);
+//     }
+// }
 
 module.exports = mongoose.model('MouvementStock', MouvementStockSchema);

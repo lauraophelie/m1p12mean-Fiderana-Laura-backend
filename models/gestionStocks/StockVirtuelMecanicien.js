@@ -30,17 +30,17 @@ const StockVirtuelMecanicienSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-StockVirtuelMecanicienSchema.methods.entreeStock = async function(data, mecanicienId) {
-    try {
-        this.dateStock = data.dateStock ? new Date(data.dateStock) : Date.now();
-        this.pieceId = data.pieceId;
-        this.quantiteEntree = data.quantite;
-        this.mecanicienId = mecanicienId;
+// StockVirtuelMecanicienSchema.methods.entreeStock = async function(data, mecanicienId) {
+//     try {
+//         this.dateStock = data.dateStock ? new Date(data.dateStock) : Date.now();
+//         this.pieceId = data.pieceId;
+//         this.quantiteEntree = data.quantite;
+//         this.mecanicienId = mecanicienId;
 
-        return await this.save();
-    } catch (error) {
-        throw new Error(error);
-    }
-}
+//         return await this.save();
+//     } catch (error) {
+//         throw new Error(error);
+//     }
+// }
 
 module.exports = mongoose.model('StockVirtuelMecanicien', StockVirtuelMecanicienSchema);
