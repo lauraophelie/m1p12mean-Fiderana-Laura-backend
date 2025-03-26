@@ -32,8 +32,15 @@ router.post('/validation/:demandeId', async (req, res) => {
         if(!demande) {
             res.status(400).json({ message: "La demande n'existe pas"});
         }
-        await demande.validateDemande();
-        const detailsDemande = await DetailsDemandePiece.find({ demandeId });
+        // const detailsDemande = await DetailsDemandePiece.find({ demandeId });
+
+        await DetailsDemandePiece.updateMany(
+            { demandeId: demandeId }, { $set: { status: 10 }}
+        );
+        await DemandePiece.updateOne(
+            { _id: demandeId }, { $set: { status: 10 }}
+        );
+        res.json({ message: "Demande de pièce validée "});
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

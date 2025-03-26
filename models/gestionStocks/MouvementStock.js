@@ -5,7 +5,7 @@ const MouvementStockSchema = new mongoose.Schema({
     dateStock: {
         type: Date, 
         required: true,
-        default: Date.now()
+        default: Date.now
     },
     pieceId: {
         type: mongoose.Schema.Types.ObjectId,

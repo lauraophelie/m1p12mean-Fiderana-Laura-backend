@@ -25,9 +25,10 @@ const DetailsDemandePieceSchema = new mongoose.Schema({
 
 DetailsDemandePieceSchema.methods.validateDetails = async function(status = 10) {
     try {
-        return await this.updateOne(
+        const result = await this.updateOne(
             { demandeId: this.demandeId }, { $set: { status: status }}
         );
+        return result;
     } catch(error) {
         throw new Error(error);
     }
