@@ -2,7 +2,8 @@ const express = require('express');
 const DemandePiece = require('../../models/pieces/demande/DemandePiece');
 const DetailsDemandePiece = require('../../models/pieces/demande/DetailsDemandePiece');
 const router = express.Router();
-const { validateDataDemande, validateDataDetailsDemande, validateDeleteDemande } = require('../../middlewares/validators/pieces/validateDemandePiece');
+const { validateDataDemande, validateDataDetailsDemande, validateDeleteDemande, checkValidationDemande } = require('../../middlewares/validators/pieces/validateDemandePiece');
+const { validationDemandePiece } = require('../../models/gestionStocks/EtatStocks');
 
 router.post('/', validateDataDemande, validateDataDetailsDemande, async (req, res) => {
     try {
@@ -20,6 +21,51 @@ router.post('/', validateDataDemande, validateDataDetailsDemande, async (req, re
             const errors = Object.values(error.errors).map(e => e.message);
             res.status(400).json({ errors });
         }
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.post('/validation/:demandeId', checkValidationDemande, async (req, res) => {
+    try {
+        const { demandeId } = req.params;
+        const demande = await DemandePiece.findById(demandeId);
+
+        if(!demande) {
+            res.status(400).json({ message: "La demande n'existe pas"});
+        }
+        const detailsDemande = await DetailsDemandePiece.find({ demandeId });
+        await Promise.all(detailsDemande.map(async (details) => {
+            const data = {
+                pieceId: details.pieceId,
+                quantiteSortie: details.quantite,
+                quantiteEntree: details.quantite,
+            };
+            await validationDemandePiece(data, demande.mecanicienId);
+        }));
+
+        await DetailsDemandePiece.updateMany(
+            { demandeId: demandeId }, { $set: { status: 10 }}
+        );
+        await DemandePiece.updateOne(
+            { _id: demandeId }, { $set: { status: 10 } }
+        );
+        res.json({ message: "Demande de pièce validée "});
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/refus/:demandeId', checkValidationDemande, async (req, res) => {
+    try {
+        const { demandeId } = req.params;
+        await DetailsDemandePiece.updateMany(
+            { demandeId: demandeId }, { $set: { status: -10 }}
+        );
+        await DemandePiece.updateOne(
+            { _id: demandeId }, { $set: { status: -10 }}
+        );
+        res.json({ message: "La demande de pièce a été rejetée"});
+    } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
