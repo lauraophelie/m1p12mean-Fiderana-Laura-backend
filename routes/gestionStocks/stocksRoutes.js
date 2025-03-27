@@ -2,7 +2,7 @@ const express = require('express');
 const MouvementStock = require('../../models/gestionStocks/MouvementStock');
 const { getEtatStocks, getEtatStocksMecanicien } = require('../../models/gestionStocks/EtatStocks');
 const StockVirtuelMecanicien = require('../../models/gestionStocks/StockVirtuelMecanicien');
-const { validateSortieStockMecanicien } = require('../../middlewares/stocks/validateMouvementStock');
+const { validateSortieStockMecanicien, checkQuantiteStockMecanicien } = require('../../middlewares/stocks/validateMouvementStock');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
@@ -41,7 +41,7 @@ router.get('/stock/:mecanicienId', async (req, res) => {
     }
 });
 
-router.post('/stock/sortie', validateSortieStockMecanicien, async (req, res) => {
+router.post('/stock/sortie', validateSortieStockMecanicien, checkQuantiteStockMecanicien, async (req, res) => {
     try {
         const mouvementSortie = new StockVirtuelMecanicien(req.body);
         await mouvementSortie.save();

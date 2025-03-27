@@ -202,6 +202,37 @@ const getEtatStocksMecanicien = async (mecanicienId) => {
     }
 };
 
+const getQuantiteRestanteMecanicien = async (mecanicienId, pieceId) => {
+    try {
+        const result = await StockVirtuelMecanicien.aggregate([
+            {
+                $match: {
+                    mecanicienId: mecanicienId,
+                    pieceId: pieceId
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalEntree: { $sum: "$quantiteEntree" },
+                    totalSortie: { $sum: "$quantiteSortie" }
+                }
+            },
+            {
+                $project: {
+                    quantiteRestante: {
+                        $subtract: ["$totalEntree", "$totalSortie"]
+                    },
+                    _id: 0
+                }
+            }
+        ]);
+        return result.length > 0 ? result[0].quantiteRestante : 0;
+    } catch (error) {
+        throw error;
+    }
+}
+
 module.exports = { 
     getEtatStocks,
     getEtatStocksMecanicien,
@@ -211,5 +242,6 @@ module.exports = {
     entreeStockMecanicien, 
     validationDemandePiece,
     validationRetourPiece,
-    validationNotifPertePiece
+    validationNotifPertePiece,
+    getQuantiteRestanteMecanicien
 };
