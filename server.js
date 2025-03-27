@@ -37,6 +37,8 @@ app.use('/api/rendezVousServices', require('./routes/rdv/rendezVousServicesRoute
 app.use('/api/demandePiece', require('./routes/pieces/demandePieceRoutes'));
 app.use('/api/demandePieceDetails', require('./routes/pieces/detailsDemandePieceRoutes'));
 app.use('/api/stocks', require('./routes/gestionStocks/stocksRoutes'));
+app.use('/api/piece/retour', require('./routes/pieces/retourPieceRoutes'));
+app.use('/api/piece/perte', require('./routes/pieces/pertePieceRoutes'));
 
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 
