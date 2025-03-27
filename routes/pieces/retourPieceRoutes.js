@@ -1,5 +1,6 @@
 const express = require('express');
 const RetourPiece = require('../../models/pieces/retour/RetourPiece');
+const { validationRetourPiece } = require('../../models/gestionStocks/EtatStocks');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
@@ -13,6 +14,37 @@ router.post('/', async (req, res) => {
             const errors = Object.values(error.errors).map(e => e.message);
             res.status(400).json({ errors });
         }
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.post('/validation/:retourId', async (req, res) => {
+    try {
+        const { retourId } = req.params;
+        const retour = await RetourPiece.findById(retourId);
+        const data = {
+            pieceId: retour.pieceId,
+            quantiteSortie: retour.quantiteRetour,
+            quantiteEntree: retour.quantiteRetour,
+        };
+        await validationRetourPiece(data, retour.mecanicienId);
+        await RetourPiece.updateOne(
+            { _id: retourId }, { $set: { status: 10 } }
+        );
+        res.json({ message: "Retour de pièce validé" });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/refus/:retourId', async (req, res) => {
+    try {
+        const { retourId } = req.params;
+        await RetourPiece.updateOne(
+            { _id: retourId }, { $set: { status: -10 } }
+        );
+        res.json({ message: "Retour de pièce refusé" });
+    } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });

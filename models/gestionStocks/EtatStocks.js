@@ -2,6 +2,28 @@ const Piece = require('../pieces/Piece');
 const MouvementStock = require('./MouvementStock');
 const StockVirtuelMecanicien = require('./StockVirtuelMecanicien');
 
+// mouvements stocks principal 
+const mouvementStockPrincipal = async (data, type) => {
+    try {
+        const pieceFind = await Piece.findById(data.pieceId);
+        if(!pieceFind) {
+            throw new Error("La pièce indiquée n'existe pas");
+        }
+        const stockData = {
+            dateStock: new Date(),
+            pieceId: data.pieceId,
+            prixUnitaire: pieceFind.prixUnitaire
+        };
+        if (type === 'entree') stockData.quantiteEntree = data.quantiteEntree;
+        else if (type === 'sortie') stockData.quantiteSortie = data.quantiteSortie;
+
+        const mouvement = new MouvementStock(stockData);
+        await mouvement.save();
+    } catch (error) {
+        throw error;
+    }
+}
+
 const sortieStock = async (data) => {
     try {
         const pieceFind = await Piece.findById(data.pieceId);
@@ -18,6 +40,30 @@ const sortieStock = async (data) => {
     } catch (error) {
         throw error;
     }
+};
+
+// mouvements stocks mécanicien 
+const mouvementStocksMecanicien = async (data, mecanicienId, type) => {
+    try {
+        const pieceFind = await Piece.findById(data.pieceId);
+        if(!pieceFind) {
+            throw new Error("La pièce indiquée n'existe pas");
+        }
+        const stockData = {
+            dateStock: new Date(),
+            pieceId: data.pieceId,
+            mecanicienId: mecanicienId
+        };
+        if (type === 'entree') {
+            stockData.quantiteEntree = data.quantiteEntree;
+        } else if (type === 'sortie') {
+            stockData.quantiteSortie = data.quantiteSortie;
+        }
+        const mouvement = new StockVirtuelMecanicien(stockData);
+        await mouvement.save();
+    } catch (error) {
+        throw new Error(error);
+    }
 }
 
 const entreeStockMecanicien = async(data, mecanicienId) => {
@@ -32,8 +78,9 @@ const entreeStockMecanicien = async(data, mecanicienId) => {
     } catch (error) {
         throw new Error(error);
     }
-}
+};
 
+// validations 
 const validationDemandePiece = async (data, mecanicienId) => {
     try {
         await sortieStock(data);
@@ -41,8 +88,27 @@ const validationDemandePiece = async (data, mecanicienId) => {
     } catch (error) {
         throw new Error(error);
     }
+};
+
+const validationRetourPiece = async (data, mecanicienId) => {
+    try {
+        await mouvementStocksMecanicien(data, mecanicienId, 'sortie');
+        await mouvementStockPrincipal(data, 'sortie');
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+const validationNotifPertePiece = async (data, mecanicienId) => {
+    try {
+        await mouvementStocksMecanicien(data, mecanicienId, 'sortie');
+    } catch (error) {
+        throw new Error(error);
+    }
 }
 
+
+// états de stocks 
 const getEtatStocks = async (dateDebut, dateFin) => {
     const debut = new Date(dateDebut);
     const fin = new Date(dateFin);
@@ -101,4 +167,13 @@ const getEtatStocks = async (dateDebut, dateFin) => {
     return resultatFinal;
 };
 
-module.exports = { getEtatStocks, sortieStock, entreeStockMecanicien, validationDemandePiece };
+module.exports = { 
+    getEtatStocks,
+    mouvementStockPrincipal,
+    mouvementStocksMecanicien,
+    sortieStock, 
+    entreeStockMecanicien, 
+    validationDemandePiece,
+    validationRetourPiece,
+    validationNotifPertePiece
+};

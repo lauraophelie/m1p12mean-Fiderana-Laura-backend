@@ -47,7 +47,7 @@ router.post('/validation/:demandeId', checkValidationDemande, async (req, res) =
             { demandeId: demandeId }, { $set: { status: 10 }}
         );
         await DemandePiece.updateOne(
-            { _id: demandeId }, { $set: { status: 10 }}
+            { _id: demandeId }, { $set: { status: 10 } }
         );
         res.json({ message: "Demande de pièce validée "});
     } catch (error) {

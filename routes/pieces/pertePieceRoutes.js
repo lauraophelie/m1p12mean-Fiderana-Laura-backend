@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const NotificationPerte = require('../../models/pieces/perte/NotificationPerte');
+const { validationNotifPertePiece } = require('../../models/gestionStocks/EtatStocks');
+const ReponsePerte = require('../../models/pieces/perte/ReponsePerte');
 
 router.post('/', async (req, res) => {
     try {
@@ -13,6 +15,40 @@ router.post('/', async (req, res) => {
             const errors = Object.values(error.errors).map(e => e.message);
             res.status(400).json({ errors });
         }
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.post('/validation/:perteId', async (req, res) => {
+    try {
+        const { perteId } = req.params;
+        const perte = await NotificationPerte.findById(perteId);
+        const data = {
+            pieceId: perte.pieceId,
+            quantiteSortie: perte.quantitePerdue,
+            quantiteEntree: perte.quantitePerdue,
+        };
+        await validationNotifPertePiece(data, perte.mecanicienId);
+        await NotificationPerte.updateOne(
+            { _id: perteId }, { $set: { status: 10 } }
+        );
+        res.json({ message: "Perte de pièce validée" });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.post('/refus/:perteId', async (req, res) => {
+    try {
+        const { perteId } = req.params;
+        const reponsePerte = new ReponsePerte(req.body);
+
+        await reponsePerte.save();
+        await NotificationPerte.updateOne(
+            { _id: perteId }, { $set: { status: -10 } }
+        );
+        res.json({ message: "Le perte de pièce a été refusée"});
+    } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
