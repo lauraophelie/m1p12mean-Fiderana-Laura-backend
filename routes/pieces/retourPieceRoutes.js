@@ -37,6 +37,7 @@ router.get('/paginate', async (req, res) => {
 
         const retours = await RetourPiece.find()
             .populate({ path: "pieceId", select: "nomPiece reference"})
+            .populate({ path: "mecanicienId", select: "nomEmploye prenom phone"})
             .skip(skip).limit(limit);
         const countRetours = await RetourPiece.countDocuments();
 
