@@ -1,9 +1,10 @@
 const express = require('express');
 const RetourPiece = require('../../models/pieces/retour/RetourPiece');
 const { validationRetourPiece } = require('../../models/gestionStocks/EtatStocks');
+const { validateDataRetourPiece, checkValidationRetourPiece } = require('../../middlewares/validators/pieces/validateRetourPiece');
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', validateDataRetourPiece, async (req, res) => {
     try {
         const retourPiece = new RetourPiece(req.body);
         await retourPiece.save();
@@ -18,7 +19,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.post('/validation/:retourId', async (req, res) => {
+router.post('/validation/:retourId', checkValidationRetourPiece, async (req, res) => {
     try {
         const { retourId } = req.params;
         const retour = await RetourPiece.findById(retourId);
@@ -37,7 +38,7 @@ router.post('/validation/:retourId', async (req, res) => {
     }
 });
 
-router.put('/refus/:retourId', async (req, res) => {
+router.put('/refus/:retourId', checkValidationRetourPiece, async (req, res) => {
     try {
         const { retourId } = req.params;
         await RetourPiece.updateOne(

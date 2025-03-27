@@ -3,8 +3,9 @@ const router = express.Router();
 const NotificationPerte = require('../../models/pieces/perte/NotificationPerte');
 const { validationNotifPertePiece } = require('../../models/gestionStocks/EtatStocks');
 const ReponsePerte = require('../../models/pieces/perte/ReponsePerte');
+const { validateDataNotifPerte, checkStatusPerte, validateReponsePerte } = require('../../middlewares/validators/pieces/validateRetourPiece');
 
-router.post('/', async (req, res) => {
+router.post('/', validateDataNotifPerte, async (req, res) => {
     try {
         const pertePiece = new NotificationPerte(req.body);
         await pertePiece.save();
@@ -19,7 +20,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.post('/validation/:perteId', async (req, res) => {
+router.post('/validation/:perteId', checkStatusPerte, async (req, res) => {
     try {
         const { perteId } = req.params;
         const perte = await NotificationPerte.findById(perteId);
@@ -38,7 +39,7 @@ router.post('/validation/:perteId', async (req, res) => {
     }
 });
 
-router.post('/refus/:perteId', async (req, res) => {
+router.post('/refus/:perteId', checkStatusPerte, validateReponsePerte, async (req, res) => {
     try {
         const { perteId } = req.params;
         const reponsePerte = new ReponsePerte(req.body);
