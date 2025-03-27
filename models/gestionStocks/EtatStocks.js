@@ -167,8 +167,44 @@ const getEtatStocks = async (dateDebut, dateFin) => {
     return resultatFinal;
 };
 
+const getEtatStocksMecanicien = async (mecanicienId) => {
+    try {
+        const listePieces = await StockVirtuelMecanicien.find({ mecanicienId }).distinct("pieceId");
+        const resultatStock = await Promise.all(listePieces.map(async (pieceId) => {
+            const mouvements = await StockVirtuelMecanicien.aggregate([
+                {
+                    $match: { pieceId: pieceId }
+                },
+                { 
+                    $group: {
+                        _id: null,
+                        entree: { $sum: "$quantiteEntree" },
+                        sortie: { $sum: "$quantiteSortie" }
+                    }
+                }
+            ]);
+
+            const mouvement = mouvements[0] || { entree: 0, sortie: 0 };
+            return {
+                pieceId,
+                quantiteEntree: mouvement.entree,
+                quantiteSortie: mouvement.sortie,
+                quantiteRestante: (mouvement.entree - mouvement.sortie)
+            }
+        }));
+        const resultatFinal = await Piece.populate(resultatStock, {
+            path: "pieceId",
+            select: "nomPiece reference"
+        });
+        return resultatFinal;
+    } catch (error) {
+        throw error;
+    }
+};
+
 module.exports = { 
     getEtatStocks,
+    getEtatStocksMecanicien,
     mouvementStockPrincipal,
     mouvementStocksMecanicien,
     sortieStock, 

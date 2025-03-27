@@ -19,7 +19,7 @@ const validateDataRetourPiece = [
 ];
 
 const checkValidationRetourPiece = [
-    async (res, res, next) => {
+    async (req, res, next) => {
         try {
             const { retourId } = req.params;
             const retour = await RetourPiece.findById(retourId);
@@ -42,7 +42,7 @@ const validateDataNotifPerte = [
         .withMessage('Veuillez indiquer la date de la perte'),
     body('explicationPerte').trim().notEmpty()
         .withMessage('Veuillez fournir une explication pour la perte'),
-    body('pieceId')
+    body('pieceId').notEmpty()
         .withMessage('Veuillez indiquer la pièce qui a été perdue'),
     body('quantitePerdue').notEmpty()
         .withMessage('Veuillez indiquer la quantité perdue'),

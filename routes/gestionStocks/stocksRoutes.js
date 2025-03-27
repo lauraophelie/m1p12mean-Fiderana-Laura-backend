@@ -1,6 +1,6 @@
 const express = require('express');
 const MouvementStock = require('../../models/gestionStocks/MouvementStock');
-const { getEtatStocks } = require('../../models/gestionStocks/EtatStocks');
+const { getEtatStocks, getEtatStocksMecanicien } = require('../../models/gestionStocks/EtatStocks');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
@@ -23,6 +23,17 @@ router.get('/etat', async (req, res) => {
             dateDebut: dateDebut,
             dateFin: dateFin
         });
+    } catch (error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+router.get('/stock/:mecanicienId', async (req, res) => {
+    try {
+        const { mecanicienId } = req.params;
+        const stocks = await getEtatStocksMecanicien(mecanicienId);
+
+        res.json({ data: stocks });
     } catch (error) {
         res.status(500).json({ message : error.message });
     }
