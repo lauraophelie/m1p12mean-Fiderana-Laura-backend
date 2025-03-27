@@ -2,7 +2,7 @@ const express = require('express');
 const DemandePiece = require('../../models/pieces/demande/DemandePiece');
 const DetailsDemandePiece = require('../../models/pieces/demande/DetailsDemandePiece');
 const router = express.Router();
-const { validateDataDemande, validateDataDetailsDemande, validateDeleteDemande } = require('../../middlewares/validators/pieces/validateDemandePiece');
+const { validateDataDemande, validateDataDetailsDemande, validateDeleteDemande, checkValidationDemande } = require('../../middlewares/validators/pieces/validateDemandePiece');
 const { validationDemandePiece } = require('../../models/gestionStocks/EtatStocks');
 
 router.post('/', validateDataDemande, validateDataDetailsDemande, async (req, res) => {
@@ -25,7 +25,7 @@ router.post('/', validateDataDemande, validateDataDetailsDemande, async (req, re
     }
 });
 
-router.post('/validation/:demandeId', async (req, res) => {
+router.post('/validation/:demandeId', checkValidationDemande, async (req, res) => {
     try {
         const { demandeId } = req.params;
         const demande = await DemandePiece.findById(demandeId);
@@ -50,6 +50,21 @@ router.post('/validation/:demandeId', async (req, res) => {
             { _id: demandeId }, { $set: { status: 10 }}
         );
         res.json({ message: "Demande de pièce validée "});
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/refus/:demandeId', checkValidationDemande, async (req, res) => {
+    try {
+        const { demandeId } = req.params;
+        await DetailsDemandePiece.updateMany(
+            { demandeId: demandeId }, { $set: { status: -10 }}
+        );
+        await DemandePiece.updateOne(
+            { _id: demandeId }, { $set: { status: -10 }}
+        );
+        res.json({ message: "La demande de pièce a été rejetée"});
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

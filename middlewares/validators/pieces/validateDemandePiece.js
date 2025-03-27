@@ -19,6 +19,25 @@ const validateDataDemande = [
     }
 ];
 
+const checkValidationDemande = [
+    async (req, res, next) => {
+        const { demandeId } = req.params;
+        try {
+            const demande = await DemandePiece.findById(demandeId);
+
+            if(!demande) {
+                return res.status(400).json({ message: "La demande indiquée n'existe pas"})
+            }
+            if(demande.status == 10) {
+                return res.status(400).json({ message: "La demande a déjà été validée"});
+            }
+            next();
+        } catch (error) {
+            return res.status(500).json({ message : error.message });
+        }
+    }
+]
+
 const validateDataDetailsDemande = [
     (req, res, next) => {
         if (!req.body.details || !Array.isArray(req.body.details)) {
@@ -61,3 +80,4 @@ const validateDeleteDemande = [
 exports.validateDataDemande = validateDataDemande;
 exports.validateDataDetailsDemande = validateDataDetailsDemande;
 exports.validateDeleteDemande = validateDeleteDemande;
+exports.checkValidationDemande = checkValidationDemande;
