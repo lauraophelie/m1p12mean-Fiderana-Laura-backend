@@ -118,6 +118,13 @@ router.get('/client/:clientId', async (req, res) => {
 
         const rdvs = await RendezVous.find({ clientId })
             .populate("clientId")
+            .populate({ 
+                path: "voitureId", select: "immatriculation marqueId modeleId",
+                populate: [
+                    { path: "marqueId", select: "designationMarque" },
+                    { path: "modeleId", select: "designationModele" }
+                ]
+            })
             .skip(skip).limit(limit);
         const countRdvs = await RendezVous.countDocuments({ clientId: clientId });
 

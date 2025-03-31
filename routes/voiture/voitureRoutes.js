@@ -61,6 +61,18 @@ router.get('/:voitureId', async (req, res) => {
     }
 });
 
+router.get('/all/:clientId', async (req, res) => {
+    try {
+        const { clientId } = req.params;
+        const voituresClient = await Voiture.find({ clientId })
+            .populate({ path: "marqueId", select: "designationMarque"})
+            .populate({ path: "modeleId", select: "designationModele"});
+        res.json({ data: voituresClient });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
 router.get('/paginate/:clientId', async (req, res) => {
     try {
         const { clientId } = req.params;
