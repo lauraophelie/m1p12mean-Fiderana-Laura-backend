@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
 
 router.get('/etat', async (req, res) => {
     try {
-        const { dateDebut, dateFin } = req.body;
+        const { dateDebut, dateFin } = req.query;
         const etatStock = await getEtatStocks(dateDebut, dateFin);
         res.json({ 
             data: etatStock,
