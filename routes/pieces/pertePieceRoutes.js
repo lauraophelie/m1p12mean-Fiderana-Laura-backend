@@ -54,7 +54,7 @@ router.post('/refus/:perteId', checkStatusPerte, validateReponsePerte, async (re
     }
 });
 
-router.get('/:perteId', async (req, res) => {
+router.get('/details/:perteId', async (req, res) => {
     try {
         const { perteId } = req.params;
         const perte = await NotificationPerte.findById(perteId)
