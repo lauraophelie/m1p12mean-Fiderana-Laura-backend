@@ -3,6 +3,7 @@ const MouvementStock = require('../../models/gestionStocks/MouvementStock');
 const { getEtatStocks, getEtatStocksMecanicien } = require('../../models/gestionStocks/EtatStocks');
 const StockVirtuelMecanicien = require('../../models/gestionStocks/StockVirtuelMecanicien');
 const { validateSortieStockMecanicien, checkQuantiteStockMecanicien } = require('../../middlewares/stocks/validateMouvementStock');
+const Piece = require('../../models/pieces/Piece');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
@@ -47,6 +48,20 @@ router.post('/stock/sortie', validateSortieStockMecanicien, checkQuantiteStockMe
         await mouvementSortie.save();
 
         res.status(201).json(mouvementSortie);
+    } catch (error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+router.get('/listePiece/:mecanicienId', async (req, res) => {
+    try {
+        const { mecanicienId } = req.params;
+        const listePiecesIds = await StockVirtuelMecanicien.distinct("pieceId", { mecanicienId });
+        const listePieces = await Piece.find({ 
+            _id: { $in: listePiecesIds } 
+        }).select("nomPiece reference");
+                    
+        res.json({ data: listePieces });
     } catch (error) {
         res.status(500).json({ message : error.message });
     }

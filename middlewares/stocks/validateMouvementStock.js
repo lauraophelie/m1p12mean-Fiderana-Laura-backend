@@ -20,6 +20,7 @@ const checkQuantiteStockMecanicien = [
     async (req, res, next) => {
         const { pieceId, mecanicienId, quantiteSortie } = req.body;
         const quantiteRestante = await getQuantiteRestanteMecanicien(mecanicienId, pieceId);
+
         if(quantiteSortie <= 0) {
             return res.status(400).json({ message: "Quantité invalide. La quantité sortie doit être positive"});
         }

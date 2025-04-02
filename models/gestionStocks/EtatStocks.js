@@ -1,6 +1,7 @@
 const Piece = require('../pieces/Piece');
 const MouvementStock = require('./MouvementStock');
 const StockVirtuelMecanicien = require('./StockVirtuelMecanicien');
+const mongoose = require('mongoose');
 
 // mouvements stocks principal 
 const mouvementStockPrincipal = async (data, type) => {
@@ -183,6 +184,7 @@ const getEtatStocksMecanicien = async (mecanicienId) => {
                     }
                 }
             ]);
+            console.log(mouvements)
 
             const mouvement = mouvements[0] || { entree: 0, sortie: 0 };
             return {
@@ -207,8 +209,8 @@ const getQuantiteRestanteMecanicien = async (mecanicienId, pieceId) => {
         const result = await StockVirtuelMecanicien.aggregate([
             {
                 $match: {
-                    mecanicienId: mecanicienId,
-                    pieceId: pieceId
+                    mecanicienId: new mongoose.Types.ObjectId(mecanicienId),
+                    pieceId: new mongoose.Types.ObjectId(pieceId)
                 }
             },
             {
@@ -217,17 +219,11 @@ const getQuantiteRestanteMecanicien = async (mecanicienId, pieceId) => {
                     totalEntree: { $sum: "$quantiteEntree" },
                     totalSortie: { $sum: "$quantiteSortie" }
                 }
-            },
-            {
-                $project: {
-                    quantiteRestante: {
-                        $subtract: ["$totalEntree", "$totalSortie"]
-                    },
-                    _id: 0
-                }
             }
         ]);
-        return result.length > 0 ? result[0].quantiteRestante : 0;
+
+        if (!result || result.length === 0) return 0;
+        return result[0].totalEntree - result[0].totalSortie;
     } catch (error) {
         throw error;
     }

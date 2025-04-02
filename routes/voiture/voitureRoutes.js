@@ -19,7 +19,6 @@ router.post('/', upload.array('images', 5), validateVoiture, async (req, res) =>
             });
             await detailsVoiture.save();
         }
-
         res.status(201).json(voiture);
     } catch(error) {
         if (error.name === "ValidationError") {
