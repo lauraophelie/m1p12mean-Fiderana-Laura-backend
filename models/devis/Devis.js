@@ -6,6 +6,11 @@ const DevisSchema = new mongoose.Schema({
         required: true,
         default: Date.now
     },
+    clientId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Client",
+        required: true
+    },
     status: {
         type: Number,
         required: false,
