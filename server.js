@@ -47,5 +47,11 @@ app.use('/employes',require('./routes/employeRoutes'));
 app.use('/clients', require('./routes/clientRoutes')); 
 app.use('/posteEmployes', require('./routes/posteEmployeRoutes')); 
 app.use('/login', require('./routes/authentificationRoutes')); 
+app.use('/clients/payement', require('./routes/PayementClient/PayementClientRoutes')); 
+app.use('/modePayement', require('./routes/modePayement/modePayementRoutes')); 
+app.use('/caisse', require('./routes/caisse/caisseRoutes')); 
+app.use('/caisse/transaction', require('./routes/caisse/transactionRoutes'));
+app.use('/clients/montantServiceClient', require('./routes/clientService/montantServiceClientRoutes')); 
+
 
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));

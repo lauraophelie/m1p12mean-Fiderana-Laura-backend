@@ -134,4 +134,33 @@ router.get('/client/:clientId', async (req, res) => {
     }
 });
 
+// liste de rendez-vous avec comme status la valaur du status donnée
+router.get('/parStatus', async (req, res) => {
+    try {
+        const { status } = req.query;
+        const rdv = await RendezVous.getRdvByStatus(status);
+        res.json({ data: rdv });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// modif de status de rdc
+router.put('/:id/status', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (status === undefined) {
+            return res.status(400).json({ message: "Le statut est requis" });
+        }
+
+        const updatedRdv = await RendezVous.updateRdvStatus(id, status);
+        res.json({ message: "Statut mis à jour avec succès", data: updatedRdv });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;
