@@ -1,0 +1,16 @@
+const mongoose = require('mongoose');
+
+const DevisSchema = new mongoose.Schema({
+    dateDevis: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
+    status: {
+        type: Number,
+        required: false,
+        default: 0
+    }
+}, { timestamps: true });
+
+module.exports = mongoose.model('Devis', DevisSchema);

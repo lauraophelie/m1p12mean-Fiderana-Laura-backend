@@ -7,7 +7,7 @@ const RemarqueDevisSchema = new mongoose.Schema({
         default: Date.now
     },
     remarqueDevis: {
-        type: string,
+        type: String,
         required: true
     },
     managerId: {
