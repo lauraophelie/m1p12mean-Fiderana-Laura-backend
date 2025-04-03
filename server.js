@@ -18,7 +18,28 @@ mongoose.connect(process.env.MONGO_URI, {
 }).then(() => console.log("MongoDB connecté"))
 .catch(err => console.log(err));
 
+// upload images
+app.use('/uploads', express.static('uploads'));
+
 // routes
+app.use('/api/marques', require('./routes/marque/marqueRoutes'));
+app.use('/api/modeles', require('./routes/modele/modeleRoutes'));
+app.use('/api/services', require('./routes/service/serviceRoutes'));
+app.use('/api/prestations', require('./routes/prestation/prestationRoutes'));
+app.use('/api/prestationsMarque', require('./routes/prestation/prestationMarqueRoutes'));
+app.use('/api/pieces', require('./routes/pieces/pieceRoutes'));
+app.use('/api/categoriePiece', require('./routes/pieces/categoriePieceRoutes'));
+app.use('/api/voiture', require('./routes/voiture/voitureRoutes'));
+app.use('/api/elementsVoiture', require('./routes/voiture/elementsVoiture'));
+app.use('/api/detailsVoiture', require('./routes/voiture/detailsVoitureRoutes'));
+app.use('/api/rendezVous', require('./routes/rdv/rendezVousRoutes'));
+app.use('/api/rendezVousServices', require('./routes/rdv/rendezVousServicesRoutes'));
+app.use('/api/demandePiece', require('./routes/pieces/demandePieceRoutes'));
+app.use('/api/demandePieceDetails', require('./routes/pieces/detailsDemandePieceRoutes'));
+app.use('/api/stocks', require('./routes/gestionStocks/stocksRoutes'));
+app.use('/api/piece/retour', require('./routes/pieces/retourPieceRoutes'));
+app.use('/api/piece/perte', require('./routes/pieces/pertePieceRoutes'));
+
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 
 // app.use('/employes',validationToken, verifierRole ("Client","Admin"),require('./routes/employeRoutes')); 
@@ -26,6 +47,5 @@ app.use('/employes',require('./routes/employeRoutes'));
 app.use('/clients', require('./routes/clientRoutes')); 
 app.use('/posteEmployes', require('./routes/posteEmployeRoutes')); 
 app.use('/login', require('./routes/authentificationRoutes')); 
-
 
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));

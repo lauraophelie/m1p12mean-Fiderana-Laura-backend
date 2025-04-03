@@ -41,4 +41,29 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ message: error.message });
     }
    });
+
+router.get('/paginate', async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const employes = await Employe.find()
+            .populate("poste")
+            .skip(skip).limit(limit);
+        const countEmployes = await Employe.countDocuments();
+
+        res.json({
+            data: employes,
+            count: countEmployes,
+            currentPage: page,
+            totalPages: Math.ceil(countEmployes / limit),
+            totalItems: countEmployes,
+            itemsPerPage: limit
+        });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
 module.exports = router;
