@@ -11,6 +11,11 @@ const DevisSchema = new mongoose.Schema({
         ref: "Client",
         required: true
     },
+    voitureId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Voiture",
+        required: true
+    },
     status: {
         type: Number,
         required: false,

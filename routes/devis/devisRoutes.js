@@ -35,4 +35,66 @@ router.post('/refus/:devisId', async (req, res) => {
     }
 });
 
+router.get('/details/:devisId', async (req, res) => {
+    try {
+        const { devisId } = req.params;
+        const detailsDevis = await Devis.findById(devisId);
+
+        res.json(detailsDevis);
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+router.get('/paginate', async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const devis = await Devis.find()
+            .populate("clientId")
+            .populate({ path: "voitureId", select: "immatriculation"})
+            .skip(skip).limit(limit);
+        const countDevis = await Devis.countDocuments();
+
+        res.json({
+            data: devis,
+            count: countDevis,
+            currentPage: page,
+            totalPages: Math.ceil(countDevis / limit),
+            totalItems: countDevis,
+            itemsPerPage: limit
+        });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+router.get('/client/:clientId', async (req, res) => {
+    try {
+        const { clientId } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const devis = await Devis.find({ clientId })
+            .populate("clientId")
+            .populate({ path: "voitureId", select: "immatriculation"})
+            .skip(skip).limit(limit);
+        const countDevis = await Devis.countDocuments({ clientId });
+
+        res.json({
+            data: devis,
+            count: countDevis,
+            currentPage: page,
+            totalPages: Math.ceil(countDevis / limit),
+            totalItems: countDevis,
+            itemsPerPage: limit
+        });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
 module.exports = router;
