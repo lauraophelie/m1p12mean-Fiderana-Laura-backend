@@ -5,10 +5,12 @@ const Employe = require('../models/Employe');
 router.post('/', async (req, res) => {
  try {
  const employe = new Employe(req.body);
+ employe.mdp=employe.prenom;
  await employe.save();
  res.status(201).json(employe);
  } catch (error) {
  res.status(400).json({ message: error.message });
+ console.log(error)
  }
 });
 // Lire tous les employes
