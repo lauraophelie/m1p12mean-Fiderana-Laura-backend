@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt=require("bcryptjs");
 
 const ClientSchema = new mongoose.Schema({
  nomClient: { type: String, required: true },
@@ -10,4 +11,19 @@ const ClientSchema = new mongoose.Schema({
  mail: { type: String, required: true },
  mdp: { type: String, required: true }
 }, { timestamps: true });
+
+ClientSchema.pre('save',function(next){
+    if(this.isModified('mdp')){
+        this.mdp=bcrypt.hashSync(this.mdp,10);
+    }
+    next();
+});
+ClientSchema.pre('update',function(next){
+    this.mdp=bcrypt.hashSync(this.mdp,10);
+
+    if(this.isModified('mdp')){
+        this.mdp=bcrypt.hashSync(this.mdp,10);
+    }
+    next();
+});
 module.exports = mongoose.model('Client', ClientSchema);
