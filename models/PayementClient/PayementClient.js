@@ -5,8 +5,7 @@ const PayementClientSchema = new mongoose.Schema({
     idClient: { 
         type: SchemaTypes.ObjectId,
         ref: 'Client', 
-        required: [true, "Vous devez entrer le client qui effectue un payement"],
-        unique: true
+        required: [true, "Vous devez entrer le client qui effectue un payement"]
     },
     montant: { 
         type: Number,

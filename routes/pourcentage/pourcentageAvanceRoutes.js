@@ -1,40 +1,40 @@
 const express = require('express');
 const router = express.Router();
-const PayementClient = require('../../models/PayementClient/PayementClient');
+const PourcentageAvance = require('../../models/pourcentage/PourcentageAvance');
 
 router.post('/', async (req, res) => {
     try {
-        const payementClient = new PayementClient(req.body);
-        await payementClient.save();
-        res.status(201).json(payementClient);
+        const pourcentageAvance = new PourcentageAvance(req.body);
+        await pourcentageAvance.save();
+        res.status(201).json(pourcentageAvance);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
-// Lire tous les payementClient
+// Lire tous les pourcentageAvance
 router.get('/', async (req, res) => {
     try {
-        const payementClient = await PayementClient.find();
-        res.json(payementClient);
+        const pourcentageAvance = await PourcentageAvance.find();
+        res.json(pourcentageAvance);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
-// Mettre à jour une payementClient
+// Mettre à jour une pourcentageAvance
 router.put('/:id', async (req, res) => {
     try {
-        const payementClient = await PayementClient.findByIdAndUpdate(req.params.id,
+        const pourcentageAvance = await PourcentageAvance.findByIdAndUpdate(req.params.id,
             req.body, { new: true });
-        res.json(payementClient);
+        res.json(pourcentageAvance);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
-// Supprimer un PayementClient
+// Supprimer un PourcentageAvance
 router.delete('/:id', async (req, res) => {
     try {
-        await PayementClient.findByIdAndDelete(req.params.id);
-        res.json({ message: "PayementClient supprimé" });
+        await PourcentageAvance.findByIdAndDelete(req.params.id);
+        res.json({ message: "PourcentageAvance supprimé" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
