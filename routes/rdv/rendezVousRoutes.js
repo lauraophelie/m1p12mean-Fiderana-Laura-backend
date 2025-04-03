@@ -48,7 +48,7 @@ router.put('/annulation/:rdvId', async (req, res) => {
     try {
         const { rdvId } = req.params;
         const annulation = await RendezVous.updateOne(
-            { _id: rdvId }, { $set: { status: -10 } }
+            { _id: rdvId }, { $set: { status: -5 } }
         );
         res.json(annulation);
     } catch(error) {
