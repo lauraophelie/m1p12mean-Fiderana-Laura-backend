@@ -26,5 +26,28 @@ const DiagnostiqueSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+DiagnostiqueSchema.statics.getDiagnoByStatus = async function(status) {
+    const filter = status !== undefined ? { status: Number(status) } : {};
+    return this.find(filter);
+};
+
+DiagnostiqueSchema.statics.updateDiagnoStatus = async function (diagnoId, newStatus) {
+    if (!mongoose.Types.ObjectId.isValid(diagnoId)) {
+        throw new Error("ID du diagnostique invalide");
+    }
+    
+    const diagno = await this.findByIdAndUpdate(
+        diagnoId, 
+        { status: Number(newStatus) }, 
+        { new: true } // Retourne le diagno mis à jour
+    );
+
+    if (!diagno) {
+        throw new Error("Aucun rendez-vous trouvé avec cet ID");
+    }
+
+    return diagno;
+};
+
 module.exports = mongoose.model('Diagnostique', DiagnostiqueSchema);
 
