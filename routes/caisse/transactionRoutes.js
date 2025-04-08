@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
 // Lire tous les transactionsCaisse
 router.get('/', async (req, res) => {
  try {
- const transactionsCaisse = await TransactionCaisse.find().populate({path:"caisse",select:"nomCaisse"}).populate({path:"employe",select:"nomEmploye prenom"});
+ const transactionsCaisse = await TransactionCaisse.find().populate({path:"idCaisse",select:"nomCaisse"}).populate({path:"employeResponsable",select:"nomEmploye prenom"});
  res.json(transactionsCaisse);
  } catch (error) {
  res.status(500).json({ message: error.message });

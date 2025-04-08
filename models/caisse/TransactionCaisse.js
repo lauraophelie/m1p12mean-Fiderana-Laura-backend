@@ -4,11 +4,10 @@ const {  SchemaTypes } = mongoose;
 const TransactionCaisseSchema = new mongoose.Schema({
     idCaisse: { 
         type: SchemaTypes.ObjectId,
-        ref: 'Caisse',
-        unique: true
+        ref: 'Caisse'
     },
     typeOperation: { //entre ou sortie
-        type: String
+        type: Number
     },
     montant: { 
         type: Number
@@ -20,7 +19,7 @@ const TransactionCaisseSchema = new mongoose.Schema({
         type:Date
     },
     employeResponsable: {
-        type: SchemaTypes.ObjectId,ref: 'employe', required: true
+        type: SchemaTypes.ObjectId,ref: 'Employe', required: true
     },
 
 }, { timestamps: true });

@@ -8,7 +8,7 @@ const DiagnostiqueSchema = new mongoose.Schema({
     },
     dateFin: { 
         type: Date,
-        required: [true, "Vous devez entrer la date de fin du diagnostique"]
+        required: false
     },
     idRendezVous: { 
         type: SchemaTypes.ObjectId,
@@ -17,7 +17,8 @@ const DiagnostiqueSchema = new mongoose.Schema({
     },
     total: { 
         type: Number,
-        min: [0, "La montant ne doit pas être négative"]
+        min: [0, "La montant ne doit pas être négative"],
+        required: false
     },
     status: { 
         type: Number,
