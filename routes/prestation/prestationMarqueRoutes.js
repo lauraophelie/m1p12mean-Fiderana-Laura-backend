@@ -57,6 +57,7 @@ router.get('/:id', async (req, res) => {
         const { id } = req.params;
         const prestationMarque = await PrestationMarque.findById(id)
                                     .populate({ path: "prestationId", select: "nomPrestation" })
+                                    .populate({ path: "modeleId", select: "designationModele" })
                                     .populate({ path: "marqueId", select: "designationMarque"});
         res.json({ data: prestationMarque });
     } catch(error) {
