@@ -79,4 +79,23 @@ router.post('/filtreParStatus', async (req, res) => {
     }
 });
 
+router.post('/diagnostique', async (req, res) => {
+    try {
+        const { diagnostique, details } = req.body;
+
+        // Vérification basique
+        if (!diagnostique || !details || !Array.isArray(details)) {
+            return res.status(400).json({ message: "Le diagnostique et les détails sont requis" });
+        }
+
+        // Appel de la méthode statique
+        const result = await Diagnostique.insererDiagnostiqueEtDetails(diagnostique, details);
+
+        res.status(201).json(result);
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const {  SchemaTypes } = mongoose;
-
+const DetailDiagnostique=require("../diagnostique/DetailDiagnostique");
 const DiagnostiqueSchema = new mongoose.Schema({
     dateDebut: { 
         type: Date, 
@@ -49,6 +49,62 @@ DiagnostiqueSchema.statics.updateDiagnoStatus = async function (diagnoId, newSta
 
     return diagno;
 };
+
+
+DiagnostiqueSchema.statics.insererDiagnostiqueEtDetails=async function(diagnostiqueData, details) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const serviceIds = details.map(detail => detail.idService);
+
+        const existingServices = await Service.find({ _id: { $in: serviceIds } }).select('_id');
+        const existingIds = existingServices.map(s => s._id.toString());
+
+        const detailsExistants = [];
+        const servicesInexistants = [];
+
+        for (const detail of details) {
+            if (existingIds.includes(detail.idService.toString())) {
+                detailsExistants.push(detail);
+            } else {
+                servicesInexistants.push(detail);
+            }
+        }
+
+        if (detailsExistants.length === 0) {
+            await session.abortTransaction();
+            session.endSession();
+            throw new Error("Vous devez faire entrer des services existants");
+        }
+
+        const [diagnostique] = await this.create([diagnostiqueData], { session });
+
+        const detailsWithDiagno = detailsExistants.map(detail => ({
+            ...detail,
+            idDiagnostique: diagnostique._id
+        }));
+        await DetailDiagnostique.insertMany(detailsWithDiagno, { session });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return {
+            message: "Diagnostique et détails enregistrés avec succès",
+            diagnostiqueId: diagnostique._id,
+            nbDetailsInsérés: detailsExistants.length,
+            servicesInexistants: servicesInexistants
+        };
+
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new Error(error.message);
+    }
+}
+
+
+
 
 module.exports = mongoose.model('Diagnostique', DiagnostiqueSchema);
 

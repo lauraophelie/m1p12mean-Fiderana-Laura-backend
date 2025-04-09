@@ -161,4 +161,41 @@ PrestationMarqueSchema.statics.getPrestationsByServiceForClient = async function
     }
 };
 
+PrestationMarqueSchema.statics.getPrestationDetailsByMarqueAndServices = async function(idMarque, servicesArray) {
+  const idServiceList = servicesArray.map(s => s.idService);
+
+  return this.find({ marqueId: idMarque })
+      .populate({
+          path: 'prestationId',
+          match: { serviceId: { $in: idServiceList } },
+          populate: { path: 'serviceId' }
+      })
+      .then(result => result.filter(pm => pm.prestationId !== null)); 
+};
+
+PrestationMarqueSchema.statics.getPrestationDetailsByMarqueAndServices = async function avoirTarifService(prestationsMarque) {
+  const tarifParService = {};
+
+  for (const pm of prestationsMarque) {
+      const idService = pm.prestationId?.serviceId?.toString();
+      const tarif = pm.tarif || 0;
+
+      if (!idService) continue;
+
+      if (!tarifParService[idService]) {
+          tarifParService[idService] = 0;
+      }
+
+      tarifParService[idService] += tarif;
+  }
+
+  // Convertir en tableau d'objets
+  return Object.entries(tarifParService).map(([idService, tarifTotal]) => ({
+      idService,
+      tarifTotal
+  }));
+}
+
+
+
 module.exports = mongoose.model('PrestationMarque', PrestationMarqueSchema);

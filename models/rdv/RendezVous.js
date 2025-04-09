@@ -118,4 +118,22 @@ RendezVousSchema.statics.updateRdvMeca = async function (rdvId, mecanicienId) {
     return rdv;
 };
 
+
+RendezVousSchema.statics.avoirModeleVoiture=async function(idRdv) {
+    const rendezVous = await this.findById(idRdv)
+    .populate({
+        path: 'voitureId',
+        populate: {
+            path: 'idModele'
+        }
+    })
+    .populate('clientId') // optionnel : si tu veux aussi les infos du client
+    .populate('mecanicienId'); // optionnel
+
+        if (!rendezVous) {
+            return res.status(404).json({ message: "Rendez-vous non trouvé" });
+        }
+    return rendezVous;
+};
+
 module.exports = mongoose.model('RendezVous', RendezVousSchema);

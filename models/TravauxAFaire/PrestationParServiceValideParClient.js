@@ -12,7 +12,7 @@ const PrestationParServiceValideParClientSchema = new mongoose.Schema({
     idMecanicienEnChef: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Employe",
-        required: [true, "Veuillez spécifier le mécanicien en chef"]
+        required: false
     },
     idDiagno: {
         type: mongoose.Schema.Types.ObjectId,
@@ -48,24 +48,25 @@ const PrestationParServiceValideParClientSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-PrestationParServiceValideParClientSchema.statics.insertionMultiplePrestationParServiceValideParClient = async function(idDiagnostique) {
-    // Vérifier si l'idDiagnostique est valide
+
+PrestationParServiceValideParClientSchema.statics.insererPrestationParServiceValideParClient = async function (prestationMarques, idDiagnostique) {
     if (!mongoose.Types.ObjectId.isValid(idDiagnostique)) {
         throw new Error("ID diagnostique invalide");
     }
 
- 
-    const prestationMarques = await PrestationMarque.getPrestationsByServiceForClient(idDiagnostique);
+    if (!Array.isArray(prestationMarques) || prestationMarques.length === 0) {
+        throw new Error("Le tableau de prestations est vide ou invalide");
+    }
 
-    const prestationsToInsert = prestationMarques.map(prestationMarque => ({
-        idPrestationMarque: prestationMarque.idPrestationMarque,
-        idDiagno: idDiagnostique, 
-        status: 0, 
+    const prestationsToInsert = prestationMarques.map(pm => ({
+        idPrestationMarque: pm._id || pm.idPrestationMarque,
+        idDiagno: idDiagnostique,
+        status: 0,
+        pourcentage: 0
+        // autres champs laissés par défaut
     }));
 
-    // Insérer tous les documents en une seule fois
-    await this.insertMany(prestationsToInsert);
-    return prestationMarques; // Retourner les résultats obtenus
-};
-
+    const insertedDocs = await PrestationParServiceValideParClient.insertMany(prestationsToInsert);
+    return insertedDocs;
+}
 module.exports = mongoose.model('PrestationParServiceValideParClient', PrestationParServiceValideParClientSchema);
