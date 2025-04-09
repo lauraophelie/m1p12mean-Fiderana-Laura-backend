@@ -2,12 +2,18 @@ const mongoose = require('mongoose');
 
 const Prestation = require('../prestation/Prestation');
 const Marque = require('../marque/Marque');
+const Modele = require('../marque/Modele');
 
 const PrestationMarqueSchema = new mongoose.Schema({
     prestationId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Prestation",
         required: [true, "Veuillez préciser la prestation concernée"]
+    },
+    modeleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Modele",
+      required: [true, "Veuillez préciser le modèle de voiture concerné"]
     },
     marqueId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -30,6 +36,11 @@ PrestationMarqueSchema.pre("save", async function (next) {
     const prestationExists = await Prestation.findById(this.prestationId);
     if(!prestationExists) {
         return next(new Error("Le prestation indiquée n'existe pas"));
+    }
+
+    const modeleExists = await Modele.findById(this.modeleId);
+    if(!modeleExists) {
+        return next(new Error("Le modèle de voiture indiqué n'existe pas"));
     }
 
     const marqueExists = await Marque.findById(this.marqueId);
