@@ -32,6 +32,8 @@ const PrestationMarqueSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+PrestationMarqueSchema.index({ prestationId: 1, modeleId: 1, marqueId: 1 }, { unique: true });
+
 PrestationMarqueSchema.pre("save", async function (next) {
     const prestationExists = await Prestation.findById(this.prestationId);
     if(!prestationExists) {
