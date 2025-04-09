@@ -30,6 +30,9 @@ const validatePrestationMarque = [
     
     body('*.marqueId').notEmpty()
         .withMessage("La marque de voiture concernée concernée doit être indiquée"),
+
+    body('*.modeleId').notEmpty()
+        .withMessage("Veuillez indiquez le modèle de voiture concerné"),
       
     body('*.tarif').notEmpty()
         .withMessage("Veuillez indiquer le tarif")

@@ -9,6 +9,11 @@ const PrestationMarqueSchema = new mongoose.Schema({
         ref: "Prestation",
         required: [true, "Veuillez préciser la prestation concernée"]
     },
+    modeleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Modele",
+      required: [true, "Veuillez préciser le modèle de voiture concerné"]
+    },
     marqueId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Marque",
