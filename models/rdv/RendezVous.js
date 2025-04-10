@@ -51,9 +51,24 @@ RendezVousSchema.pre("save", async function (next) {
 });
 
 RendezVousSchema.statics.getRdvByStatus = async function(status) {
+    console.log("status")
     const filter = status !== undefined ? { status: Number(status) } : {};
+    console.log("status1")
     return this.find(filter);
 };
+
+RendezVousSchema.statics.getRdvByMecanicienId = async function(mecanicienId) {
+    const mecanicien = await Employe.findById(mecanicienId).populate("poste");
+
+    if (!mecanicien) {
+        throw new Error("Aucun mécanicien trouvé avec cet ID");
+    }
+
+    return this.find({mecanicienId}).populate(
+         'clientId',  'nomClient prenom'
+    );
+};
+
 
 RendezVousSchema.statics.updateRdvStatus = async function (rdvId, newStatus) {
     if (!mongoose.Types.ObjectId.isValid(rdvId)) {
@@ -63,7 +78,7 @@ RendezVousSchema.statics.updateRdvStatus = async function (rdvId, newStatus) {
     const rdv = await this.findByIdAndUpdate(
         rdvId, 
         { status: Number(newStatus) }, 
-        { new: true } // Retourne le RDV mis à jour
+        { new: true , runValidators: false } // Retourne le RDV mis à jour
     );
 
     if (!rdv) {
@@ -79,20 +94,21 @@ RendezVousSchema.statics.updateRdvMeca = async function (rdvId, mecanicienId) {
     }
 
     // Vérifier si le mécanicien existe et récupérer son poste
-    const mecanicien = await Employe.findById(mecanicienId).populate("poste");
+    const mecanicien = await Employe.findById(mecanicienId);
+    console.log("mecanicien", mecanicien)
 
     if (!mecanicien) {
         throw new Error("Aucun mécanicien trouvé avec cet ID");
     }
 
-    // Vérifier si son poste est bien "mécanicien" (sans tenir compte de la casse)
-    if (!mecanicien.poste || !mecanicien.poste.nomPoste || mecanicien.poste.nomPoste.toLowerCase() !== "mécanicien") {
-        throw new Error("L'employé n'a pas le poste de mécanicien");
-    }
+    // // Vérifier si son poste est bien "mécanicien" (sans tenir compte de la casse)
+    // if (!mecanicien.poste || !mecanicien.poste.nomPoste || mecanicien.poste.nomPoste.toLowerCase() !== "mecanicien") {
+    //     throw new Error("L'employé n'a pas le poste de mécanicien"+mecanicien.poste.nomPoste);
+    // }
     const rdv = await this.findByIdAndUpdate(
         rdvId, 
-        { mecanicienId: (mecanicienId) }, 
-        { new: true } // Retourne le RDV mis à jour
+        { mecanicienId: (mecanicienId),status:10 }, 
+        { new: true, runValidators: false  } // Retourne le RDV mis à jour
     );
 
     if (!rdv) {
@@ -100,6 +116,24 @@ RendezVousSchema.statics.updateRdvMeca = async function (rdvId, mecanicienId) {
     }
 
     return rdv;
+};
+
+
+RendezVousSchema.statics.avoirModeleVoiture=async function(idRdv) {
+    const rendezVous = await this.findById(idRdv)
+    .populate({
+        path: 'voitureId',
+        populate: {
+            path: 'idModele'
+        }
+    })
+    .populate('clientId') // optionnel : si tu veux aussi les infos du client
+    .populate('mecanicienId'); // optionnel
+
+        if (!rendezVous) {
+            return res.status(404).json({ message: "Rendez-vous non trouvé" });
+        }
+    return rendezVous;
 };
 
 module.exports = mongoose.model('RendezVous', RendezVousSchema);

@@ -60,6 +60,20 @@ router.get('/:voitureId', async (req, res) => {
     }
 });
 
+router.get('/', async (req, res) => {
+    try {
+        const voiture = await Voiture.find()
+            .populate({ path: "marqueId", select: "designationMarque"})
+            .populate({ path: "modeleId", select: "designationModele"})
+            .populate({ path: "categorieVoitureId", select: "designationCategorie"})
+            .populate({ path: "typeEnergieId", select: "designationTypeEnergie"})
+            .populate({ path: "boiteVitesseId", select: "designationBoite"});
+        res.json({ data: voiture });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
 router.get('/all/:clientId', async (req, res) => {
     try {
         const { clientId } = req.params;

@@ -141,31 +141,117 @@ router.get('/client/:clientId', async (req, res) => {
     }
 });
 
-// liste de rendez-vous avec comme status la valaur du status donnée
-router.get('/parStatus', async (req, res) => {
+// Route pour récupérer les rendez-vous d'un mécanicien spécifique
+router.get('/mecanicien/:mecanicienId', async (req, res) => {
+    const { mecanicienId } = req.params;
+
     try {
-        const { status } = req.query;
-        const rdv = await RendezVous.getRdvByStatus(status);
-        res.json({ data: rdv });
+        const rdvs = await RendezVous.getRdvByMecanicienId(mecanicienId);
+        res.status(200).json({ data: rdvs });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+
+router.patch('/assigner-mecanicien', async (req, res) => {
+    const { rdvId, mecanicienId } = req.body;
+
+    try {
+        const rdvMisAJour = await RendezVous.updateRdvMeca(rdvId, mecanicienId);
+        res.status(200).json({ message: "Rendez-vous mis à jour avec succès", data: rdvMisAJour });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.get('/statusPaginate/:status', async (req, res) => {
+    try {
+        const { status } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        if (!status) {
+            return res.status(400).json({ message: "Le statut est requis" });
+        }
+
+        const rdvs = await RendezVous.find({ status })
+            .populate("clientId", "nomClient prenom") 
+            .skip(skip)
+            .limit(limit);
+
+        const totalItems = await RendezVous.countDocuments({ status });
+
+        if (rdvs.length === 0) {
+            return res.status(404).json({ message: "Aucun rendez-vous trouvé pour ce statut" });
+        }
+
+        res.json({
+            data: rdvs,
+            currentPage: page,
+            totalPages: Math.ceil(totalItems / limit),
+            totalItems,
+            itemsPerPage: limit
+        });
+
+    } catch (error) {
+        console.error("Erreur lors de la récupération des RDVs par statut :", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.get('/status/:status', async (req, res) => {
+    try {
+        const { status } = req.params;  // Le statut passé en paramètre de requête
+        if (status === undefined) {
+            return res.status(400).json({ message: "Le statut est requis" });
+        }
+
+        // Appel à la méthode getRdvByStatus pour obtenir les RDV filtrés par statut
+        const rdvs = await RendezVous.getRdvByStatus(status);
+        
+        if (rdvs.length === 0) {
+            return res.status(404).json({ message: "Aucun rendez-vous trouvé pour ce statut" });
+        }
+
+        res.json({ data: rdvs });
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
-// modif de status de rdc
-router.put('/:id/status', async (req, res) => {
+router.get('/detail/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { status } = req.body;
 
-        if (status === undefined) {
-            return res.status(400).json({ message: "Le statut est requis" });
+        const rdv = await RendezVous.findById(id)
+            .populate({
+                path: 'clientId',
+                select: 'nom prenom'  // On prend juste le nom et prénom
+            })
+            .populate({
+                path: 'voitureId',
+                populate: [
+                    { path: 'marqueId', select: 'designationMarque' },
+                    { path: 'modeleId', select: 'designationModele' },
+                    { path: 'categorieVoitureId', select: 'designationCategorie' },
+                    { path: 'typeEnergieId', select: 'designationTypeEnergie' },
+                    { path: 'boiteVitesseId', select: 'designationBoite' },
+                    { path: 'clientId', select: 'nom prenom' } // si tu veux aussi les infos client dans voiture
+                ],
+                select: 'immatriculation marqueId modeleId categorieVoitureId typeEnergieId boiteVitesseId anneeFabrication'
+            });
+
+        if (!rdv) {
+            return res.status(404).json({ message: 'Rendez-vous introuvable' });
         }
 
-        const updatedRdv = await RendezVous.updateRdvStatus(id, status);
-        res.json({ message: "Statut mis à jour avec succès", data: updatedRdv });
+        res.status(200).json({ data: rdv });
 
     } catch (error) {
+        console.error('Erreur lors de la récupération du rendez-vous :', error);
         res.status(500).json({ message: error.message });
     }
 });
