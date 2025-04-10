@@ -1,6 +1,7 @@
 const Piece = require('../pieces/Piece');
 const MouvementStock = require('./MouvementStock');
 const StockVirtuelMecanicien = require('./StockVirtuelMecanicien');
+const mongoose = require('mongoose');
 
 // mouvements stocks principal 
 const mouvementStockPrincipal = async (data, type) => {
@@ -183,6 +184,7 @@ const getEtatStocksMecanicien = async (mecanicienId) => {
                     }
                 }
             ]);
+            console.log(mouvements)
 
             const mouvement = mouvements[0] || { entree: 0, sortie: 0 };
             return {
@@ -202,6 +204,31 @@ const getEtatStocksMecanicien = async (mecanicienId) => {
     }
 };
 
+const getQuantiteRestanteMecanicien = async (mecanicienId, pieceId) => {
+    try {
+        const result = await StockVirtuelMecanicien.aggregate([
+            {
+                $match: {
+                    mecanicienId: new mongoose.Types.ObjectId(mecanicienId),
+                    pieceId: new mongoose.Types.ObjectId(pieceId)
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalEntree: { $sum: "$quantiteEntree" },
+                    totalSortie: { $sum: "$quantiteSortie" }
+                }
+            }
+        ]);
+
+        if (!result || result.length === 0) return 0;
+        return result[0].totalEntree - result[0].totalSortie;
+    } catch (error) {
+        throw error;
+    }
+}
+
 module.exports = { 
     getEtatStocks,
     getEtatStocksMecanicien,
@@ -211,5 +238,6 @@ module.exports = {
     entreeStockMecanicien, 
     validationDemandePiece,
     validationRetourPiece,
-    validationNotifPertePiece
+    validationNotifPertePiece,
+    getQuantiteRestanteMecanicien
 };

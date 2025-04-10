@@ -19,7 +19,6 @@ router.post('/', upload.array('images', 5), validateVoiture, async (req, res) =>
             });
             await detailsVoiture.save();
         }
-
         res.status(201).json(voiture);
     } catch(error) {
         if (error.name === "ValidationError") {
@@ -70,6 +69,18 @@ router.get('/', async (req, res) => {
             .populate({ path: "typeEnergieId", select: "designationTypeEnergie"})
             .populate({ path: "boiteVitesseId", select: "designationBoite"});
         res.json({ data: voiture });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+router.get('/all/:clientId', async (req, res) => {
+    try {
+        const { clientId } = req.params;
+        const voituresClient = await Voiture.find({ clientId })
+            .populate({ path: "marqueId", select: "designationMarque"})
+            .populate({ path: "modeleId", select: "designationModele"});
+        res.json({ data: voituresClient });
     } catch(error) {
         res.status(500).json({ message : error.message });
     }

@@ -50,7 +50,7 @@ router.put('/refus/:retourId', checkValidationRetourPiece, async (req, res) => {
     }
 });
 
-router.get('/:retourId', async (req, res) => {
+router.get('/details/:retourId', async (req, res) => {
     try {
         const { retourId } = req.params;
         const retour = await RetourPiece.findById(retourId)
