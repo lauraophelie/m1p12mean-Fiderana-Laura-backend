@@ -4,7 +4,7 @@ const DemandePieceSchema = new mongoose.Schema({
     dateDemande: {
         type: Date,
         required: true,
-        default: Date.now()
+        default: Date.now
     },
     motifDemande: {
         type: String,

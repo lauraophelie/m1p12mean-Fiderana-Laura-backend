@@ -35,6 +35,10 @@ router.post('/validation/:perteId', checkStatusPerte, async (req, res) => {
         );
         res.json({ message: "Perte de pièce validée" });
     } catch (error) {
+        if (error.name === "ValidationError") {
+            const errors = Object.values(error.errors).map(e => e.message);
+            res.status(400).json({ errors });
+        }
         res.status(400).json({ message: error.message });
     }
 });
@@ -50,11 +54,15 @@ router.post('/refus/:perteId', checkStatusPerte, validateReponsePerte, async (re
         );
         res.json({ message: "Le perte de pièce a été refusée"});
     } catch (error) {
+        if (error.name === "ValidationError") {
+            const errors = Object.values(error.errors).map(e => e.message);
+            res.status(400).json({ errors });
+        }
         res.status(400).json({ message: error.message });
     }
 });
 
-router.get('/:perteId', async (req, res) => {
+router.get('/details/:perteId', async (req, res) => {
     try {
         const { perteId } = req.params;
         const perte = await NotificationPerte.findById(perteId)

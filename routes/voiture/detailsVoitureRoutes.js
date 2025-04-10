@@ -22,4 +22,14 @@ router.post('/:voitureId', upload.array('images', 5), async (req, res) => {
     }
 });
 
+router.get('/:voitureId', async (req, res) => {
+    try {
+        const { voitureId } = req.params;
+        const details = await DetailsVoiture.findOne({ voitureId });
+        res.json({ data: details });
+    } catch (error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
 module.exports = router;

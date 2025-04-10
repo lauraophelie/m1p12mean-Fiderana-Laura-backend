@@ -39,6 +39,8 @@ app.use('/api/demandePieceDetails', require('./routes/pieces/detailsDemandePiece
 app.use('/api/stocks', require('./routes/gestionStocks/stocksRoutes'));
 app.use('/api/piece/retour', require('./routes/pieces/retourPieceRoutes'));
 app.use('/api/piece/perte', require('./routes/pieces/pertePieceRoutes'));
+app.use('/api/devis', require('./routes/devis/devisRoutes'));
+app.use('/api/remarqueDevis', require('./routes/devis/remarqueDevisRoutes'));
 
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 

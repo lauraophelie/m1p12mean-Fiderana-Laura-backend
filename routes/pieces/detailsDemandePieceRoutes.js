@@ -28,7 +28,7 @@ router.delete('/:demandeId', validateDeleteDemande, async (req, res) => {
     try {
         const { demandeId } = req.params;
         await DetailsDemandePiece.deleteMany({ demandeId: demandeId });
-        res.json({ message: "La détails de la demande de pièce indiquée a été supprimée"});
+        res.json({ message: "Les détails de la demande de pièce indiquée a été supprimée"});
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

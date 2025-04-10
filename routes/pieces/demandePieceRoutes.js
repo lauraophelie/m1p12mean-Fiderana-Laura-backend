@@ -70,7 +70,7 @@ router.put('/refus/:demandeId', checkValidationDemande, async (req, res) => {
     }
 });
 
-router.put('/:demandeId', validateDataDemande, async (req, res) => {
+router.put('/modif/:demandeId', validateDataDemande, async (req, res) => {
     try {
         const { demandeId } = req.params;
         const demande = await DemandePiece.findByIdAndUpdate(demandeId, req.body, { new: true });
@@ -93,7 +93,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:demandeId', async (req, res) => {
+router.get('/details/:demandeId', async (req, res) => {
     try {
         const { demandeId } = req.params;
         const demande = await DemandePiece.findById(demandeId)
@@ -104,7 +104,7 @@ router.get('/:demandeId', async (req, res) => {
     }
 });
 
-router.get('/:mecanicienId', async (req, res) => {
+router.get('/meca/:mecanicienId', async (req, res) => {
     try {
         const { mecanicienId } = req.params;
         const page = parseInt(req.query.page) || 1;
