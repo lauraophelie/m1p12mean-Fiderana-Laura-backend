@@ -4,7 +4,7 @@ const RemarqueDevis = require('../../models/devis/RemarqueDevis');
 const router = express.Router();
 
 // validation par le manager
-router.post('/validation/:devisId', async (req, res) => {
+/*router.post('/validation/:devisId', async (req, res) => {
     try {
         const { devisId } = req.params;
         const validation = await Devis.updateOne(
@@ -95,6 +95,6 @@ router.get('/client/:clientId', async (req, res) => {
     } catch(error) {
         res.status(500).json({ message : error.message });
     }
-});
+});*/
 
 module.exports = router;
