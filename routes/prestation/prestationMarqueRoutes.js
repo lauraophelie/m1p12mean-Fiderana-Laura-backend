@@ -6,7 +6,7 @@ const { validatePrestationMarque, validateOnePrestationMarque } = require('../..
 const HistoriquePrestationMarque = require('../../models/prestation/HistoriquePrestationMarque');
 const mongoose = require('mongoose');
 
-router.post('/', validatePrestationMarque, async (req, res) => {
+router.post('/',  async (req, res) => {
     try {
         const prestationsMarque = await PrestationMarque.insertMany(req.body);
         res.status(201).json(prestationsMarque);

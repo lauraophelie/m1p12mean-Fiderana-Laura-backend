@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Diagnostique = require('../../models/diagnostique/Diagnostique');
-
+const rdv=require("../../models/rdv/RendezVous");
+const prestationM=require("../../models/prestation/PrestationMarque");
+const prestationParService=require("../../models/TravauxAFaire/PrestationParServiceValideParClient");
 router.post('/', async (req, res) => {
     try {
         const diagnostique = new Diagnostique(req.body);
@@ -79,18 +81,21 @@ router.post('/filtreParStatus', async (req, res) => {
     }
 });
 
-router.post('/diagnostique', async (req, res) => {
+router.post('/diagnostiqueDetail', async (req, res) => {
     try {
         const { diagnostique, details } = req.body;
 
         // Vérification basique
-        if (!diagnostique || !details || !Array.isArray(details)) {
+        if (!diagnostique || !details ) {
             return res.status(400).json({ message: "Le diagnostique et les détails sont requis" });
         }
 
-        // Appel de la méthode statique
-        const result = await Diagnostique.insererDiagnostiqueEtDetails(diagnostique, details);
-
+        // // Appel de la méthode statique
+        const rdvDiagno=await rdv.avoirModeleVoiture(diagnostique.idRendezVous);
+        const prestationMarques=await prestationM.getPrestationDetailsByModeleAndServices(rdvDiagno.voitureId.modeleId._id,details);
+        const detailsPrestations= await prestationM.getPrestationDetailsByMarqueAndServices(prestationMarques);
+        const result = await Diagnostique.insererDiagnostiqueEtDetails(diagnostique, detailsPrestations);
+        const presta=prestationParService.insererPrestationParServiceValideParClient(prestationMarques,result.diagnostiqueId);
         res.status(201).json(result);
 
     } catch (error) {

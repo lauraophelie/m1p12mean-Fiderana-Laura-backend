@@ -51,9 +51,7 @@ RendezVousSchema.pre("save", async function (next) {
 });
 
 RendezVousSchema.statics.getRdvByStatus = async function(status) {
-    console.log("status")
     const filter = status !== undefined ? { status: Number(status) } : {};
-    console.log("status1")
     return this.find(filter);
 };
 
@@ -95,7 +93,6 @@ RendezVousSchema.statics.updateRdvMeca = async function (rdvId, mecanicienId) {
 
     // Vérifier si le mécanicien existe et récupérer son poste
     const mecanicien = await Employe.findById(mecanicienId);
-    console.log("mecanicien", mecanicien)
 
     if (!mecanicien) {
         throw new Error("Aucun mécanicien trouvé avec cet ID");
@@ -124,15 +121,17 @@ RendezVousSchema.statics.avoirModeleVoiture=async function(idRdv) {
     .populate({
         path: 'voitureId',
         populate: {
-            path: 'idModele'
+            path: 'modeleId'
         }
     })
     .populate('clientId') // optionnel : si tu veux aussi les infos du client
     .populate('mecanicienId'); // optionnel
 
-        if (!rendezVous) {
-            return res.status(404).json({ message: "Rendez-vous non trouvé" });
-        }
+    if (!rendezVous) {
+        // Tu peux soit retourner null, soit throw une erreur ici
+        console.log("Rendez-vous non trouvé");
+        return null;
+    }
     return rendezVous;
 };
 
