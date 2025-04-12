@@ -81,6 +81,45 @@ router.post('/filtreParStatus', async (req, res) => {
     }
 });
 
+router.post('/filtreParStatusEtClient', async (req, res) => {
+    try {
+        const { status, page = 1, limit = 10, idClient } = req.body;
+
+        const query = {};
+        if (status !== undefined) {
+            query.status = Number(status);
+        }
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        // Récupération des diagnostics avec le populate sur le rendez-vous
+        const diagno = await Diagnostique.find(query)
+            .populate({
+                path: 'idRendezVous',
+                populate: { path: 'clientId' } // on va jusqu'au client
+            });
+
+        // Filtrage manuel sur le client
+        const filteredDiagnostics = diagno.filter(d => {
+            return d.idRendezVous && d.idRendezVous.idClient && d.idRendezVous.idClient.toString() === idClient;
+        });
+
+        const paginatedDiagnostics = filteredDiagnostics.slice(skip, skip + parseInt(limit));
+
+        res.json({
+            data: paginatedDiagnostics,
+            count: filteredDiagnostics.length,
+            currentPage: parseInt(page),
+            totalPages: Math.ceil(filteredDiagnostics.length / parseInt(limit)),
+            totalItems: filteredDiagnostics.length,
+            itemsPerPage: parseInt(limit)
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 router.post('/diagnostiqueDetail', async (req, res) => {
     try {
         const { diagnostique, details } = req.body;
