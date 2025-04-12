@@ -21,6 +21,11 @@ const DiagnostiqueSchema = new mongoose.Schema({
         min: [0, "La montant ne doit pas être négative"],
         required: false
     },
+    avancePrevus: { 
+        type: Number,
+        min: [0, "La montant ne doit pas être négative"],
+        required: false
+    },
     status: { 
         type: Number,
         required: false,
@@ -99,6 +104,17 @@ DiagnostiqueSchema.statics.insererDiagnostiqueEtDetails=async function(diagnosti
         // session.endSession();
         throw new Error(error.message);
     }
+}
+
+DiagnostiqueSchema.statics.calculerSommeTarifs= function(services) {
+    if (!Array.isArray(services)) {
+        throw new Error("L'argument doit être un tableau");
+    }
+
+    const total = services.reduce((somme, service) => {
+        return somme + (service.tarif || 0);
+    }, 0);
+    return total;
 }
 
 

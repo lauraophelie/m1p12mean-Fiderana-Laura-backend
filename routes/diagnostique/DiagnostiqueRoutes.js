@@ -93,8 +93,9 @@ router.post('/diagnostiqueDetail', async (req, res) => {
         // // Appel de la méthode statique
         const rdvDiagno=await rdv.avoirModeleVoiture(diagnostique.idRendezVous);
         const prestationMarques=await prestationM.getPrestationDetailsByModeleAndServices(rdvDiagno.voitureId.modeleId._id,details);
-        const detailsPrestations= await prestationM.getPrestationDetailsByMarqueAndServices(prestationMarques);
-        const result = await Diagnostique.insererDiagnostiqueEtDetails(diagnostique, detailsPrestations);
+        // serviceAvecTarif
+        const serviceTarif= await prestationM.getPrestationDetailsByMarqueAndServices(prestationMarques);
+        const result = await Diagnostique.insererDiagnostiqueEtDetails(diagnostique, serviceTarif);
         const presta=prestationParService.insererPrestationParServiceValideParClient(prestationMarques,result.diagnostiqueId);
         res.status(201).json(result);
 

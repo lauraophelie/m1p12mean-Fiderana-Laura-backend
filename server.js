@@ -59,6 +59,9 @@ app.use('/clients/payement', require('./routes/PayementClient/PayementClientRout
 app.use('/diagnostique', require('./routes/diagnostique/DiagnostiqueRoutes')); 
 app.use('/detailDiagnostique', require('./routes/diagnostique/DetailDiagnostiqueRoutes')); 
 app.use('/prestationParService', require('./routes/travauxAFaire/PrestationParServiceParClientRoutes')); 
+app.use('/pourcentageAvance', require('./routes/pourcentage/pourcentageAvanceRoutes')); 
+app.use('/historiquePourcentageAvance', require('./routes/pourcentage/historiquePourcentageRoutes')); 
+app.use('/valeurPourcentage', require('./routes/pourcentage/valeurPourPourcentageRoutes')); 
 
 
 
