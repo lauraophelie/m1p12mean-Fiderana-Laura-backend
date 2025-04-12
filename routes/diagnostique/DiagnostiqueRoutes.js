@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Diagnostique = require('../../models/diagnostique/Diagnostique');
-
+const rdv=require("../../models/rdv/RendezVous");
+const prestationM=require("../../models/prestation/PrestationMarque");
+const prestationParService=require("../../models/TravauxAFaire/PrestationParServiceValideParClient");
 router.post('/', async (req, res) => {
     try {
         const diagnostique = new Diagnostique(req.body);
@@ -79,18 +81,61 @@ router.post('/filtreParStatus', async (req, res) => {
     }
 });
 
-router.post('/diagnostique', async (req, res) => {
+router.post('/filtreParStatusEtClient', async (req, res) => {
+    try {
+        const { status, page = 1, limit = 10, idClient } = req.body;
+
+        const query = {};
+        if (status !== undefined) {
+            query.status = Number(status);
+        }
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        // Récupération des diagnostics avec le populate sur le rendez-vous
+        const diagno = await Diagnostique.find(query)
+            .populate({
+                path: 'idRendezVous',
+                populate: { path: 'clientId' } // on va jusqu'au client
+            });
+
+        // Filtrage manuel sur le client
+        const filteredDiagnostics = diagno.filter(d => {
+            return d.idRendezVous && d.idRendezVous.idClient && d.idRendezVous.idClient.toString() === idClient;
+        });
+
+        const paginatedDiagnostics = filteredDiagnostics.slice(skip, skip + parseInt(limit));
+
+        res.json({
+            data: paginatedDiagnostics,
+            count: filteredDiagnostics.length,
+            currentPage: parseInt(page),
+            totalPages: Math.ceil(filteredDiagnostics.length / parseInt(limit)),
+            totalItems: filteredDiagnostics.length,
+            itemsPerPage: parseInt(limit)
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.post('/diagnostiqueDetail', async (req, res) => {
     try {
         const { diagnostique, details } = req.body;
 
         // Vérification basique
-        if (!diagnostique || !details || !Array.isArray(details)) {
+        if (!diagnostique || !details ) {
             return res.status(400).json({ message: "Le diagnostique et les détails sont requis" });
         }
 
-        // Appel de la méthode statique
-        const result = await Diagnostique.insererDiagnostiqueEtDetails(diagnostique, details);
-
+        // // Appel de la méthode statique
+        const rdvDiagno=await rdv.avoirModeleVoiture(diagnostique.idRendezVous);
+        const prestationMarques=await prestationM.getPrestationDetailsByModeleAndServices(rdvDiagno.voitureId.modeleId._id,details);
+        // serviceAvecTarif
+        const serviceTarif= await prestationM.getPrestationDetailsByMarqueAndServices(prestationMarques);
+        const result = await Diagnostique.insererDiagnostiqueEtDetails(diagnostique, serviceTarif);
+        const presta=prestationParService.insererPrestationParServiceValideParClient(prestationMarques,result.diagnostiqueId);
         res.status(201).json(result);
 
     } catch (error) {

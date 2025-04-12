@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const {  SchemaTypes } = mongoose;
 const DetailDiagnostique=require("../diagnostique/DetailDiagnostique");
+const Service=require("../service/Service");
 const DiagnostiqueSchema = new mongoose.Schema({
     dateDebut: { 
         type: Date, 
@@ -16,6 +17,11 @@ const DiagnostiqueSchema = new mongoose.Schema({
         required: [true, "Vous devez entrer le rendez-vous concerné "]
     },
     total: { 
+        type: Number,
+        min: [0, "La montant ne doit pas être négative"],
+        required: false
+    },
+    avancePrevus: { 
         type: Number,
         min: [0, "La montant ne doit pas être négative"],
         required: false
@@ -53,14 +59,12 @@ DiagnostiqueSchema.statics.updateDiagnoStatus = async function (diagnoId, newSta
 
 DiagnostiqueSchema.statics.insererDiagnostiqueEtDetails=async function(diagnostiqueData, details) {
     const session = await mongoose.startSession();
-    session.startTransaction();
+    // session.startTransaction();
 
     try {
         const serviceIds = details.map(detail => detail.idService);
-
         const existingServices = await Service.find({ _id: { $in: serviceIds } }).select('_id');
         const existingIds = existingServices.map(s => s._id.toString());
-
         const detailsExistants = [];
         const servicesInexistants = [];
 
@@ -73,7 +77,7 @@ DiagnostiqueSchema.statics.insererDiagnostiqueEtDetails=async function(diagnosti
         }
 
         if (detailsExistants.length === 0) {
-            await session.abortTransaction();
+            // await session.abortTransaction();
             session.endSession();
             throw new Error("Vous devez faire entrer des services existants");
         }
@@ -86,21 +90,31 @@ DiagnostiqueSchema.statics.insererDiagnostiqueEtDetails=async function(diagnosti
         }));
         await DetailDiagnostique.insertMany(detailsWithDiagno, { session });
 
-        await session.commitTransaction();
-        session.endSession();
+        // await session.commitTransaction();
+        // session.endSession();
 
         return {
-            message: "Diagnostique et détails enregistrés avec succès",
             diagnostiqueId: diagnostique._id,
             nbDetailsInsérés: detailsExistants.length,
             servicesInexistants: servicesInexistants
         };
 
     } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
+        // await session.abortTransaction();
+        // session.endSession();
         throw new Error(error.message);
     }
+}
+
+DiagnostiqueSchema.statics.calculerSommeTarifs= function(services) {
+    if (!Array.isArray(services)) {
+        throw new Error("L'argument doit être un tableau");
+    }
+
+    const total = services.reduce((somme, service) => {
+        return somme + (service.tarif || 0);
+    }, 0);
+    return total;
 }
 
 

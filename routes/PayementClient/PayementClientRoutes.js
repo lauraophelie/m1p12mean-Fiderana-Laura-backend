@@ -65,6 +65,43 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/:idClient', async (req, res) => {
+  try {
+      const { idClient } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+
+      const query = { idClient }; // On filtre par idClient
+      
+
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+
+      const payements = await PayementClient.find(query)
+          .populate('idClient')
+          .populate('modePayement')
+          .skip(skip)
+          .limit(parseInt(limit));
+
+      const totalCount = await PayementClient.countDocuments(query);
+
+      if (!payements || payements.length === 0) {
+          return res.status(404).json({ message: 'Aucun paiement trouvé' });
+      }
+
+      res.status(200).json({
+          data: payements,
+          count: totalCount,
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(totalCount / parseInt(limit)),
+          itemsPerPage: parseInt(limit)
+      });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Erreur du serveur', error: error.message });
+  }
+});
+
 router.post('/', (req, res) => {
     const { payementClient, confirmation ,idEmploye} = req.body;
   

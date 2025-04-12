@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const PrestationMarque = require('../prestationMarque/PrestationMarque');
+const PrestationMarque = require('../prestation/PrestationMarque');
 const Employe = require('../Employe');
 const Diagnostique = require('../diagnostique/Diagnostique');
 
@@ -66,7 +66,7 @@ PrestationParServiceValideParClientSchema.statics.insererPrestationParServiceVal
         // autres champs laissés par défaut
     }));
 
-    const insertedDocs = await PrestationParServiceValideParClient.insertMany(prestationsToInsert);
+    const insertedDocs = await this.insertMany(prestationsToInsert);
     return insertedDocs;
 }
 module.exports = mongoose.model('PrestationParServiceValideParClient', PrestationParServiceValideParClientSchema);

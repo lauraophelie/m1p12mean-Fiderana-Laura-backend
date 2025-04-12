@@ -57,6 +57,13 @@ app.use('/caisse/transaction', require('./routes/caisse/transactionRoutes'));
 app.use('/clients/montantServiceClient', require('./routes/clientService/montantServiceClientRoutes')); 
 app.use('/clients/payement', require('./routes/PayementClient/PayementClientRoutes')); 
 app.use('/diagnostique', require('./routes/diagnostique/DiagnostiqueRoutes')); 
+app.use('/detailDiagnostique', require('./routes/diagnostique/DetailDiagnostiqueRoutes')); 
+app.use('/prestationParService', require('./routes/travauxAFaire/PrestationParServiceParClientRoutes')); 
+app.use('/pourcentageAvance', require('./routes/pourcentage/pourcentageAvanceRoutes')); 
+app.use('/historiquePourcentageAvance', require('./routes/pourcentage/historiquePourcentageRoutes')); 
+app.use('/valeurPourcentage', require('./routes/pourcentage/valeurPourPourcentageRoutes')); 
+
+
 
 
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));

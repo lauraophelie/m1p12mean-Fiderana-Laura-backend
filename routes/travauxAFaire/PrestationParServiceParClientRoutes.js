@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const PrestationParServiceValideParClient = require('../models/PrestationParServiceValideParClient');
+const PrestationParServiceValideParClient = require('../../models/TravauxAFaire/PrestationParServiceValideParClient');
 
 // 🔹 Créer une prestation validée par un client
 router.post('/', async (req, res) => {
@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
     try {
         const prestations = await PrestationParServiceValideParClient.find()
             .populate("idPrestationMarque")
-            .populate("idMecanicienEnChef", "nom prenom")
+            // .populate("idMecanicienEnChef", "nom prenom")
             .populate("idDiagno");
         res.json(prestations);
     } catch (error) {

@@ -20,6 +20,21 @@ router.get('/', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+// pour afficher le detail de chaque diagno
+router.get('/:idDiagnostique', async (req, res) => {
+    try {
+        const { idDiagnostique } = req.params;
+
+        const details = await DetailDiagnostique.find({ idDiagnostique })
+            .populate('idService'); // on récupère les infos du service
+
+        res.json(details);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des détails du diagnostique :', error);
+        res.status(500).json({ message: "Erreur serveur", error: error.message });
+    }
+});
+
 // Mettre à jour une detailDiagnostique
 router.put('/:id', async (req, res) => {
     try {
