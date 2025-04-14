@@ -74,4 +74,37 @@ router.get('/details/:id', async (req, res) => {
     }
 });
 
+router.get('/client/:clientId', async (req, res) => {
+    try {
+        const { clientId } = req.params;
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const rdvIds = await RendezVous.find({ clientId }).distinct('_id');
+        const diagnostiques = await Diagnostique.find({ idRendezVous: { $in: rdvIds } })
+            .populate({ 
+                path: "idRendezVous", 
+                select: "dateRdv heureRdv clientId voitureId",
+                populate: [
+                    { path: "clientId", select: "nomClient prenom"}
+                ]
+             })
+            .skip(skip).limit(limit);
+        const countDiagnostiques = await Diagnostique.countDocuments({ idRendezVous: { $in: rdvIds } });
+
+        res.json({
+            data: diagnostiques,
+            count: countDiagnostiques,
+            currentPage: page,
+            totalPages: Math.ceil(countDiagnostiques / limit),
+            totalItems: countDiagnostiques,
+            itemsPerPage: limit
+        });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
 module.exports = router;
