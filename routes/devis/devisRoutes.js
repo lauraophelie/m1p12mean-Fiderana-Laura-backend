@@ -45,6 +45,24 @@ router.post('/validation/:id', async (req, res) => {
     }
 });
 
+router.refus('/refus/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const remarqueDevis = new RemarqueDevis(req.body);
+
+        await remarqueDevis.save();
+        await Diagnostique.updateDiagnoStatus(id, 0);
+
+        res.json(remarqueDevis);
+    } catch(error) {
+        if (error.name === "ValidationError") {
+            const errors = Object.values(error.errors).map(e => e.message);
+            res.status(400).json({ errors });
+        }
+        res.status(400).json({ message: error.message });
+    }
+})
+
 // validation par le manager
 /*router.post('/validation/:devisId', async (req, res) => {
     try {
