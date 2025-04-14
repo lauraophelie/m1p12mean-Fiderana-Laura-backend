@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const {  SchemaTypes } = mongoose;
 const DetailDiagnostique=require("../diagnostique/DetailDiagnostique");
 const Service=require("../service/Service");
+const PourcentageAvance=require("../pourcentage/PourcentageAvance");
+const ValeurPourPourcentage=require("../pourcentage/valeurPourPourcentage");
 const DiagnostiqueSchema = new mongoose.Schema({
     dateDebut: { 
         type: Date, 
@@ -81,7 +83,8 @@ DiagnostiqueSchema.statics.insererDiagnostiqueEtDetails=async function(diagnosti
             session.endSession();
             throw new Error("Vous devez faire entrer des services existants");
         }
-
+        diagnostiqueData.total=await this.calculerSommeTarifs(details);
+        diagnostiqueData.avancePrevus=await this.calculerAvancePourDiagnostique(diagnostiqueData.total);
         const [diagnostique] = await this.create([diagnostiqueData], { session });
 
         const detailsWithDiagno = detailsExistants.map(detail => ({
@@ -112,13 +115,46 @@ DiagnostiqueSchema.statics.calculerSommeTarifs= function(services) {
     }
 
     const total = services.reduce((somme, service) => {
-        return somme + (service.tarif || 0);
+        return somme + (service.tarifTotal || 0);
     }, 0);
     return total;
 }
 
 
+DiagnostiqueSchema.statics.calculerAvancePourDiagnostique=async function(total) {
+    try {
+        const intervalles = await ValeurPourPourcentage.find().sort({ valeurMin: 1 });
 
+        let intervalleCorrespondant = null;
+        for (let intervalle of intervalles) {
+            const { valeurMin, valeurMax } = intervalle;
+            if (
+                total >= valeurMin &&
+                (valeurMax === undefined || valeurMax === null || total < valeurMax)
+            ) {
+                intervalleCorrespondant = intervalle;
+                break;
+            }
+        }
+
+        if (!intervalleCorrespondant) {
+            throw new Error("Aucun intervalle ne correspond à ce montant.");
+        }
+        const pourcentageAvance = await PourcentageAvance.findOne({
+            idValeurPourPourcentage: intervalleCorrespondant._id
+        }).sort({ date: -1 }); // On prend le plus récent si plusieurs
+
+        if (!pourcentageAvance) {
+            throw new Error("Aucun pourcentage trouvé pour cet intervalle.");
+        }
+
+        // Calcul de l'avance
+        const avance = Math.round(total *pourcentageAvance.pourcentage / 100);
+        return avance;
+    } catch (error) {
+        throw new Error("Erreur lors du calcul de l'avance : " + error.message);
+    }
+}
 
 module.exports = mongoose.model('Diagnostique', DiagnostiqueSchema);
 

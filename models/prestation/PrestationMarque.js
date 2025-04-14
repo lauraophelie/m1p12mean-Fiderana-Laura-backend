@@ -95,7 +95,7 @@ PrestationMarqueSchema.statics.getPrestationDetailsByModeleAndServices = async f
       .then(result => result.filter(pm => pm.prestationId !== null)); 
 };
 
-PrestationMarqueSchema.statics.getPrestationDetailsByMarqueAndServices = async function avoirTarifService(prestationsMarque) {
+PrestationMarqueSchema.statics.getPrestationDetailsByMarqueAndServices = async function(prestationsMarque) {
   const tarifParService = {};
   for (const pm of prestationsMarque) {
       const idService = pm.prestationId?.serviceId?._id.toString();
