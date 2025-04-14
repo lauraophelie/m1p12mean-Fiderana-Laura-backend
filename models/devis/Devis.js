@@ -19,8 +19,8 @@ const getDetailsDevisRdv = async (rdvId) => {
         const details = [];
 
         for(const service of servicesRendezVous) {
-            const { serviceId } = service;
-            const prestationService = await Prestation.find({ serviceId });
+            const { _id, nomService } = service.serviceId;
+            const prestationService = await Prestation.find({ serviceId: _id });
 
             let somme = 0;
             for(const prestation of prestationService) {
@@ -30,7 +30,8 @@ const getDetailsDevisRdv = async (rdvId) => {
                 somme += prestationMarque.tarif;
             }
             details.push({
-                service,
+                idService: _id,
+                service: nomService,
                 total: somme
             });
         }
@@ -42,14 +43,28 @@ const getDetailsDevisRdv = async (rdvId) => {
 
 const getDetailsDevis = async (id) => {
     try {
-        const diagnostiqueFind = await Diagnostique.findById(id);
+        const diagnostiqueFind = await Diagnostique.findById(id)
+            .populate({ 
+                path: "idRendezVous", 
+                select: "dateRdv heureRdv clientId voitureId",
+                populate: [
+                    { path: "clientId", select: "nomClient prenom"}
+                ]
+            });
         if(!diagnostiqueFind) {
             throw new Error("Le devis indiqué n'existe pas");
         }
         const detailsDiagnostique = await DetailDiagnostique.find({ id })
             .populate({ path: "idService", select: "nomService" });
 
-        return detailsDiagnostique;
+        const { idRendezVous } = diagnostiqueFind;
+        const detailsServicesRdv = await getDetailsDevisRdv(idRendezVous);
+
+        return {
+            diagnostique: diagnostiqueFind,
+            detailsServiceRdv: detailsServicesRdv,
+            detailsDiagnostique: detailsDiagnostique
+        };
     } catch (error) {
         throw error;
     }
