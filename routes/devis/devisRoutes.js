@@ -45,7 +45,7 @@ router.post('/validation/:id', async (req, res) => {
     }
 });
 
-router.refus('/refus/:id', async (req, res) => {
+router.post('/refus/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const remarqueDevis = new RemarqueDevis(req.body);
@@ -61,7 +61,24 @@ router.refus('/refus/:id', async (req, res) => {
         }
         res.status(400).json({ message: error.message });
     }
-})
+});
+
+router.get('/details/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const detailsDevis = await Diagnostique.findById(id)
+            .populate({ 
+                path: "idRendezVous", 
+                select: "dateRdv heureRdv clientId voitureId",
+                populate: [
+                    { path: "clientId", select: "nomClient prenom"}
+                ]
+            });
+        res.json(detailsDevis);
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
 
 // validation par le manager
 /*router.post('/validation/:devisId', async (req, res) => {

@@ -184,7 +184,6 @@ const getEtatStocksMecanicien = async (mecanicienId) => {
                     }
                 }
             ]);
-            console.log(mouvements)
 
             const mouvement = mouvements[0] || { entree: 0, sortie: 0 };
             return {
