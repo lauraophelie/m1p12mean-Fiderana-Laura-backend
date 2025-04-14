@@ -1,7 +1,38 @@
 const express = require('express');
 const Devis = require('../../models/devis/Devis');
 const RemarqueDevis = require('../../models/devis/RemarqueDevis');
+const Diagnostique = require('../../models/diagnostique/Diagnostique');
 const router = express.Router();
+
+router.get('/paginate', async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const diagnostiques = await Diagnostique.find()
+            .populate({ 
+                path: "idRendezVous", 
+                select: "dateRdv heureRdv clientId voitureId",
+                populate: [
+                    { path: "clientId", select: "nomClient prenom"}
+                ]
+             })
+            .skip(skip).limit(limit);
+        const countDiagnostiques = await Diagnostique.countDocuments();
+
+        res.json({
+            data: diagnostiques,
+            count: countDiagnostiques,
+            currentPage: page,
+            totalPages: Math.ceil(countDiagnostiques / limit),
+            totalItems: countDiagnostiques,
+            itemsPerPage: limit
+        });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
 
 // validation par le manager
 /*router.post('/validation/:devisId', async (req, res) => {
