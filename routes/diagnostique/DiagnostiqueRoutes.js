@@ -136,6 +136,9 @@ router.post('/diagnostiqueDetail', async (req, res) => {
         const serviceTarif= await prestationM.getPrestationDetailsByMarqueAndServices(prestationMarques);
         const result = await Diagnostique.insererDiagnostiqueEtDetails(diagnostique, serviceTarif);
         const presta=prestationParService.insererPrestationParServiceValideParClient(prestationMarques,result.diagnostiqueId);
+
+        // const pourcentage= await Diagnostique.calculerAvancePourDiagnostique(900000);
+        // console.log(pourcentage+"result")
         res.status(201).json(result);
 
     } catch (error) {
