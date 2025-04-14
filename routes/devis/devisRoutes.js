@@ -35,6 +35,17 @@ router.get('/paginate', async (req, res) => {
 });
 
 // validation par le manager
+router.post('/validation/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const validation = await Diagnostique.updateDiagnoStatus(id, 10);
+        res.json(validation);
+    } catch(error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+// validation par le manager
 /*router.post('/validation/:devisId', async (req, res) => {
     try {
         const { devisId } = req.params;
