@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const PrestationMarque = require('../prestation/PrestationMarque');
-const Employe = require('../Employe');
+const Employe = require('../Employe/Employe');
 const Diagnostique = require('../diagnostique/Diagnostique');
 
 const PrestationParServiceValideParClientSchema = new mongoose.Schema({

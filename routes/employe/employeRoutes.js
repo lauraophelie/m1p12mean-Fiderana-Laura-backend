@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Employe = require('../models/Employe');
+const Employe = require('../../models/Employe/Employe');
 // Créer un employe
 router.post('/', async (req, res) => {
  try {
@@ -65,5 +65,18 @@ router.get('/paginate', async (req, res) => {
         res.status(500).json({ message : error.message });
     }
 });
+
+router.get('/:id', async (req, res) => {
+    try {
+        const employe = await Employe.findById(req.params.id).populate("poste");
+        if (!employe) {
+            return res.status(404).json({ message: "Employé non trouvé" });
+        }
+        res.json(employe);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 
 module.exports = router;

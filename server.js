@@ -45,7 +45,7 @@ app.use('/api/remarqueDevis', require('./routes/devis/remarqueDevisRoutes'));
 app.use('/profils', require('./routes/profilRoutes')); 
 app.use('/postes', require('./routes/posteRoutes')); 
 // app.use('/employes',validationToken, verifierRole ("Client","Admin"),require('./routes/employeRoutes')); 
-app.use('/employes',require('./routes/employeRoutes')); 
+app.use('/employes',require('./routes/employe/employeRoutes')); 
 app.use('/clients', require('./routes/clientRoutes')); 
 app.use('/posteEmployes', require('./routes/posteEmployeRoutes')); 
 app.use('/login', require('./routes/authentificationRoutes')); 
