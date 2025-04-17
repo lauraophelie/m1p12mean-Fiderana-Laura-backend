@@ -1,30 +1,58 @@
 const express = require('express');
 const Devis = require('../../models/devis/Devis');
 const RemarqueDevis = require('../../models/devis/RemarqueDevis');
+const Diagnostique = require('../../models/diagnostique/Diagnostique');
 const router = express.Router();
 
-// validation par le manager
-/*router.post('/validation/:devisId', async (req, res) => {
+router.get('/paginate', async (req, res) => {
     try {
-        const { devisId } = req.params;
-        const validation = await Devis.updateOne(
-            { _id: devisId }, { $set: { status: 10 } }
-        );
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const diagnostiques = await Diagnostique.find()
+            .populate({ 
+                path: "idRendezVous", 
+                select: "dateRdv heureRdv clientId voitureId",
+                populate: [
+                    { path: "clientId", select: "nomClient prenom"}
+                ]
+             })
+            .skip(skip).limit(limit);
+        const countDiagnostiques = await Diagnostique.countDocuments();
+
+        res.json({
+            data: diagnostiques,
+            count: countDiagnostiques,
+            currentPage: page,
+            totalPages: Math.ceil(countDiagnostiques / limit),
+            totalItems: countDiagnostiques,
+            itemsPerPage: limit
+        });
+    } catch(error) {
+        res.status(500).json({ message : error.message });
+    }
+});
+
+// validation par le manager
+router.post('/validation/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const validation = await Diagnostique.updateDiagnoStatus(id, 10);
         res.json(validation);
     } catch(error) {
         res.status(400).json({ message: error.message });
     }
 });
 
-router.post('/refus/:devisId', async (req, res) => {
+router.post('/refus/:id', async (req, res) => {
     try {
-        const { devisId } = req.params;
+        const { id } = req.params;
         const remarqueDevis = new RemarqueDevis(req.body);
 
         await remarqueDevis.save();
-        await Devis.updateOne(
-            { _id: devisId }, { $set: { status: 0 } }
-        );
+        await Diagnostique.updateDiagnoStatus(id, 0);
+
         res.json(remarqueDevis);
     } catch(error) {
         if (error.name === "ValidationError") {
@@ -35,37 +63,12 @@ router.post('/refus/:devisId', async (req, res) => {
     }
 });
 
-router.get('/details/:devisId', async (req, res) => {
+router.get('/details/:id', async (req, res) => {
     try {
-        const { devisId } = req.params;
-        const detailsDevis = await Devis.findById(devisId);
+        const { id } = req.params;
+        const detailsDevis = await Devis.getDetailsDevis(id);
 
         res.json(detailsDevis);
-    } catch(error) {
-        res.status(500).json({ message : error.message });
-    }
-});
-
-router.get('/paginate', async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
-
-        const devis = await Devis.find()
-            .populate("clientId")
-            .populate({ path: "voitureId", select: "immatriculation"})
-            .skip(skip).limit(limit);
-        const countDevis = await Devis.countDocuments();
-
-        res.json({
-            data: devis,
-            count: countDevis,
-            currentPage: page,
-            totalPages: Math.ceil(countDevis / limit),
-            totalItems: countDevis,
-            itemsPerPage: limit
-        });
     } catch(error) {
         res.status(500).json({ message : error.message });
     }
@@ -74,27 +77,34 @@ router.get('/paginate', async (req, res) => {
 router.get('/client/:clientId', async (req, res) => {
     try {
         const { clientId } = req.params;
+
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
-        const devis = await Devis.find({ clientId })
-            .populate("clientId")
-            .populate({ path: "voitureId", select: "immatriculation"})
+        const rdvIds = await RendezVous.find({ clientId }).distinct('_id');
+        const diagnostiques = await Diagnostique.find({ idRendezVous: { $in: rdvIds } })
+            .populate({ 
+                path: "idRendezVous", 
+                select: "dateRdv heureRdv clientId voitureId",
+                populate: [
+                    { path: "clientId", select: "nomClient prenom"}
+                ]
+             })
             .skip(skip).limit(limit);
-        const countDevis = await Devis.countDocuments({ clientId });
+        const countDiagnostiques = await Diagnostique.countDocuments({ idRendezVous: { $in: rdvIds } });
 
         res.json({
-            data: devis,
-            count: countDevis,
+            data: diagnostiques,
+            count: countDiagnostiques,
             currentPage: page,
-            totalPages: Math.ceil(countDevis / limit),
-            totalItems: countDevis,
+            totalPages: Math.ceil(countDiagnostiques / limit),
+            totalItems: countDiagnostiques,
             itemsPerPage: limit
         });
     } catch(error) {
         res.status(500).json({ message : error.message });
     }
-});*/
+});
 
 module.exports = router;

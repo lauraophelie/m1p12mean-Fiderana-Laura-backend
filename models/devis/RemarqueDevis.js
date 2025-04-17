@@ -17,6 +17,7 @@ const RemarqueDevisSchema = new mongoose.Schema({
     },
     devisId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "Diagnostique",
         required: true
     }
 }, { timestamps: true });
