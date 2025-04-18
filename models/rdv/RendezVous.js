@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const Client = require('../Client');
 const Voiture = require('../voiture/Voiture');
-const Employe = require('../Employe');
-
+const Employe=require('../Employe/Employe');
 const RendezVousSchema = new mongoose.Schema({
     dateRdv: {
         type: Date,
