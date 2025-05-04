@@ -2,8 +2,8 @@ const express = require('express');
 const Devis = require('../../models/devis/Devis');
 const RemarqueDevis = require('../../models/devis/RemarqueDevis');
 const Diagnostique = require('../../models/diagnostique/Diagnostique');
+const DetailDiagnostique = require('../../models/diagnostique/DetailDiagnostique');
 const router = express.Router();
-
 router.get('/paginate', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -71,6 +71,39 @@ router.get('/details/:id', async (req, res) => {
         res.json(detailsDevis);
     } catch(error) {
         res.status(500).json({ message : error.message });
+    }
+});
+
+// ajout service @ devis
+router.post('/ajoutService/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const listeServiceAjoute = req.body;
+        for(let i = 0; i < listeService.length; i++) {
+            listeServiceAjoute[i].idDiagnostique = id;
+        }
+        await DetailDiagnostique.insertMany(listeServiceAjoute);
+    } catch(error) {
+        if (error.name === "ValidationError") {
+            const errors = Object.values(error.errors).map(e => e.message);
+            res.status(400).json({ errors });
+        }
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/validationService/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const listeService = req.body;
+        for(let i = 0; i < listeService.length; i++) {
+            await DetailDiagnostique.updateOne(
+                { idDiagnostique: id, idService: listeService[i].service },
+                { $set: { status: listeService[i].status } }
+            )
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message });
     }
 });
 

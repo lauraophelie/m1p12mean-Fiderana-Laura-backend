@@ -14,7 +14,7 @@ const DetailDiagnostiqueSchema = new mongoose.Schema({
     },
     montant: { 
         type: Number,
-        min: [0, "La montant ne doit pas être négative"],
+        min: [0, "La montant ne doit pas être négatif"],
         required: false
     },
     status: { 
