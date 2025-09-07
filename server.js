@@ -41,9 +41,10 @@ app.use('/api/piece/retour', require('./routes/pieces/retourPieceRoutes'));
 app.use('/api/piece/perte', require('./routes/pieces/pertePieceRoutes'));
 app.use('/api/devis', require('./routes/devis/devisRoutes'));
 app.use('/api/remarqueDevis', require('./routes/devis/remarqueDevisRoutes'));
+app.use('/api/avisClientMecanicien', require('./routes/avisClient/avisClientMecanicienRoutes'))
 
 app.use('/profils', require('./routes/profilRoutes')); 
-app.use('/postes', require('./routes/posteRoutes')); 
+// app.use('/postes', require('./routes/posteRoutes')); 
 // app.use('/employes',validationToken, verifierRole ("Client","Admin"),require('./routes/employeRoutes')); 
 app.use('/employes',require('./routes/employe/employeRoutes')); 
 app.use('/clients', require('./routes/clientRoutes')); 
