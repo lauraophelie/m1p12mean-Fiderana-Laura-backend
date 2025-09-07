@@ -59,7 +59,7 @@ DiagnostiqueSchema.statics.updateDiagnoStatus = async function (diagnoId, newSta
 };
 
 
-DiagnostiqueSchema.statics.insererDiagnostiqueEtDetails=async function(diagnostiqueData, details) {
+DiagnostiqueSchema.statics.insererDiagnostiqueEtDetails = async function(diagnostiqueData, details) {
     const session = await mongoose.startSession();
     // session.startTransaction();
 
@@ -83,8 +83,8 @@ DiagnostiqueSchema.statics.insererDiagnostiqueEtDetails=async function(diagnosti
             session.endSession();
             throw new Error("Vous devez faire entrer des services existants");
         }
-        diagnostiqueData.total=await this.calculerSommeTarifs(details);
-        diagnostiqueData.avancePrevus=await this.calculerAvancePourDiagnostique(diagnostiqueData.total);
+        diagnostiqueData.total = await this.calculerSommeTarifs(details);
+        diagnostiqueData.avancePrevus = await this.calculerAvancePourDiagnostique(diagnostiqueData.total);
         const [diagnostique] = await this.create([diagnostiqueData], { session });
 
         const detailsWithDiagno = detailsExistants.map(detail => ({
